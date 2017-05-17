@@ -1,0 +1,35 @@
+{
+  "name": "glance",
+  "version": "0.0.0",
+  "description": "Hello Expo!",
+  "author": null,
+  "main": "main.js",
+  "scripts": {
+    "test": "node node_modules/jest/bin/jest.js"
+  },
+  "jest": {
+    "preset": "jest-expo"
+  },
+  "dependencies": {
+    "@expo/ex-navigation": "~2.10.0",
+    "@expo/samples": "~1.0.3",
+    "axios": "^0.16.1",
+    "body-parser": "^1.17.1",
+    "expo": "16.0.0",
+    "express": "^4.15.2",
+    "firebase": "^3.9.0",
+    "mongoose": "^4.9.8",
+    "native-base": "^2.1.2",
+    "path": "^0.12.7",
+    "react": "16.0.0-alpha.6",
+    "react-native": "https://github.com/exponent/react-native/archive/sdk-16.0.0.tar.gz",
+    "react-native-popup-dialog": "^0.7.28",
+    "redux": "^3.6.0",
+    "redux-logger": "^3.0.1",
+    "redux-promise-middleware": "^4.2.0",
+    "redux-thunk": "^2.2.0"
+  },
+  "devDependencies": {
+    "jest-expo": "0.4.0"
+  }
+}
