@@ -3,6 +3,8 @@ import {View} from 'react-native';
 import axios from 'axios';
 import {setUserEmail, setUserName, fetchUser} from "../redux/userActions";
 import {connect} from "react-redux";
+const pItem = Picker.Item;
+
 
 import {
     Content,
@@ -13,7 +15,8 @@ import {
     Icon,
     Button,
     Text,
-    Thumbnail
+    Thumbnail,
+    Picker
 } from 'native-base';
 
 import PopupDialog, {SlideAnimation} from 'react-native-popup-dialog';
@@ -28,7 +31,9 @@ export default class EditProfilePopup extends React.Component {
     constructor(props)
     {
         super(props);
-        this.state = {}
+        this.state = {
+            selectedRelationship: 'key0'
+        }
     }
 
     componentDidMount()
@@ -36,6 +41,18 @@ export default class EditProfilePopup extends React.Component {
         this
             .popupDialog
             .show();
+    }
+
+    componentDidUpdate(prevProps, prevState)
+    {
+        this
+            .popupDialog
+            .show();
+    }
+
+    componentWillUpdate(nextProps, nextState)
+    {
+       
     }
 
     _UpdateProfilePress()
@@ -49,13 +66,17 @@ export default class EditProfilePopup extends React.Component {
         const {user} = this.props;
 
         return (
+           
             <PopupDialog
                 width={'90%'}
                 height={'60%'}
+                dismissOnTouchOutside={false}
+                dismissOnHardwareBackPress={false}
                 ref={(popupDialog) => {
                 this.popupDialog = popupDialog;
             }}
-                dialogAnimation={new SlideAnimation({slideFrom: 'bottom'})}>
+                dialogAnimation={new SlideAnimation({slideFrom: 'bottom'})} 
+                > 
                 <Content>
                     <Thumbnail
                         size={80}
@@ -64,44 +85,60 @@ export default class EditProfilePopup extends React.Component {
                         marginTop: 30,
                         alignSelf: 'center'
                     }}/>
+
                     <Form style={{
                         marginTop: 15
                     }}>
-                        <Item fixedLabel style={{
-                            marginTop: 10
-                        }}>
-                            <Label>Relationship</Label>
-                            <Input />
-                        </Item>
-                        <Item fixedLabel style={{
+
+                        <Picker
+                            supportedOrientations={['portrait']}
+                            iosHeader="Select Relationship"
+                            mode="dropdown"
+                            onValueChange={(selectedRelationship) => this.setState({selectedRelationship})}
+                            selectedValue={this.state.selectedRelationship}>
+                            <pItem label="Single" value="key0"/>
+                            <pItem label="In a Relationship" value="key1"/>
+                        </Picker>
+
+                        <Item
+                            fixedLabel
+                            style={{
                             marginTop: 30
                         }}>
                             <Label>Full Name</Label>
-                            <Input />
+                            <Input/>
                         </Item>
-                        <Item fixedLabel style={{
+                        <Item
+                            fixedLabel
+                            style={{
                             marginTop: 30
                         }}>
                             <Label>Sex</Label>
-                            <Input />
+                            <Input/>
                         </Item>
-                        <Item fixedLabel style={{
+                        <Item
+                            fixedLabel
+                            style={{
                             marginTop: 30
                         }}>
                             <Label>Home City</Label>
-                            <Input />
+                            <Input/>
                         </Item>
-                        <Item fixedLabel style={{
+                        <Item
+                            fixedLabel
+                            style={{
                             marginTop: 30
                         }}>
                             <Label>Birthday</Label>
-                            <Input />
+                            <Input/>
                         </Item>
-                        <Item fixedLabel style={{
+                        <Item
+                            fixedLabel
+                            style={{
                             marginTop: 30
                         }}>
                             <Label>Short Bio</Label>
-                            <Input multiline={true} />
+                            <Input multiline={true}/>
                         </Item>
                     </Form>
                     <Button
@@ -128,7 +165,7 @@ export default class EditProfilePopup extends React.Component {
                         <Text>Cancel</Text>
                     </Button >
                 </Content>
-            </PopupDialog>
+            </PopupDialog> 
         );
 
     }
