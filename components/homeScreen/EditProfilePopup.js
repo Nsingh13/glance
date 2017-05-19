@@ -4,7 +4,7 @@ import axios from 'axios';
 import {setUserEmail, setUserName, fetchUser} from "../redux/userActions";
 import {connect} from "react-redux";
 const pItem = Picker.Item;
-
+const showAnimation = true;
 
 import {
     Content,
@@ -19,7 +19,7 @@ import {
     Picker
 } from 'native-base';
 
-import PopupDialog, {SlideAnimation} from 'react-native-popup-dialog';
+import PopupDialog, {SlideAnimation, DefaultAnimation, ScaleAnimation} from 'react-native-popup-dialog';
 
 @connect((store) => {
     return {user: store.user}
@@ -32,7 +32,7 @@ export default class EditProfilePopup extends React.Component {
     {
         super(props);
         this.state = {
-            selectedRelationship: 'key0'
+            selectedRelationship: 'key0',
         }
     }
 
@@ -52,7 +52,7 @@ export default class EditProfilePopup extends React.Component {
 
     componentWillUpdate(nextProps, nextState)
     {
-       
+      showAnimation = false;
     }
 
     _UpdateProfilePress()
@@ -67,7 +67,7 @@ export default class EditProfilePopup extends React.Component {
 
         return (
            
-            <PopupDialog
+          <PopupDialog
                 width={'90%'}
                 height={'60%'}
                 dismissOnTouchOutside={false}
@@ -75,7 +75,7 @@ export default class EditProfilePopup extends React.Component {
                 ref={(popupDialog) => {
                 this.popupDialog = popupDialog;
             }}
-                dialogAnimation={new SlideAnimation({slideFrom: 'bottom'})} 
+                dialogAnimation={showAnimation ? new SlideAnimation({slideFrom: 'bottom'}): new DefaultAnimation({toValue: 0, animationDuration: 0})}
                 > 
                 <Content>
                     <Thumbnail
