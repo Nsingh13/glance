@@ -3,6 +3,7 @@ import {View} from 'react-native';
 import axios from 'axios';
 import {setUserEmail, setUserName, fetchUser} from "../redux/userActions";
 import {connect} from "react-redux";
+import {ImagePicker} from 'expo';
 const pItem = Picker.Item;
 const showAnimation = true;
 
@@ -16,7 +17,8 @@ import {
     Button,
     Text,
     Thumbnail,
-    Picker
+    Picker,
+    Radio
 } from 'native-base';
 
 import PopupDialog, {SlideAnimation, DefaultAnimation, ScaleAnimation} from 'react-native-popup-dialog';
@@ -33,6 +35,8 @@ export default class EditProfilePopup extends React.Component {
         super(props);
         this.state = {
             selectedRelationship: 'key0',
+            selectedSex: 'None',
+            orientation: 'None'
         }
     }
 
@@ -52,7 +56,7 @@ export default class EditProfilePopup extends React.Component {
 
     componentWillUpdate(nextProps, nextState)
     {
-      showAnimation = false;
+        showAnimation = false;
     }
 
     _UpdateProfilePress()
@@ -66,8 +70,8 @@ export default class EditProfilePopup extends React.Component {
         const {user} = this.props;
 
         return (
-           
-          <PopupDialog
+
+            <PopupDialog
                 width={'90%'}
                 height={'60%'}
                 dismissOnTouchOutside={false}
@@ -75,8 +79,9 @@ export default class EditProfilePopup extends React.Component {
                 ref={(popupDialog) => {
                 this.popupDialog = popupDialog;
             }}
-                dialogAnimation={showAnimation ? new SlideAnimation({slideFrom: 'bottom'}): new DefaultAnimation({toValue: 0, animationDuration: 0})}
-                > 
+                dialogAnimation={showAnimation
+                ? new SlideAnimation({slideFrom: 'bottom'})
+                : new DefaultAnimation({toValue: 0, animationDuration: 0})}>
                 <Content>
                     <Thumbnail
                         size={80}
@@ -89,8 +94,8 @@ export default class EditProfilePopup extends React.Component {
                     <Form style={{
                         marginTop: 15
                     }}>
-
                         <Picker
+                            style={{marginLeft: 10}}
                             supportedOrientations={['portrait']}
                             iosHeader="Select Relationship"
                             mode="dropdown"
@@ -99,7 +104,34 @@ export default class EditProfilePopup extends React.Component {
                             <pItem label="Single" value="key0"/>
                             <pItem label="In a Relationship" value="key1"/>
                         </Picker>
-
+                        <Item
+                        underline={false}
+                            fixedLabel
+                            style={{
+                            marginTop: 15
+                        }}>
+                            <Label style={{marginTop: 10}}>Sex</Label>
+                            <Text>Male</Text>
+                            <Radio style={{marginLeft: 5}} selected={this.state.selectedSex === 'Male' ? true: false}  onPress={(selectedSex) => this.setState({selectedSex: 'Male'})}/>
+                            <Text style={{marginLeft: 10}}>Female</Text>
+                            <Radio style={{marginLeft: 5}} selected={this.state.selectedSex === 'Female' ? true: false} onPress={(selectedSex) => this.setState({selectedSex: 'Female'})}/>
+                            <Text style={{marginLeft: 10}}>Other</Text>
+                            <Radio style={{marginLeft: 5, marginRight: 10}} selected={this.state.selectedSex === 'Other' ? true: false} onPress={(selectedSex) => this.setState({selectedSex: 'Other'})}/>
+                        </Item>
+                        <Item
+                        underline={false}
+                            fixedLabel
+                            style={{
+                            marginTop: 30
+                        }}>
+                            <Label style={{marginTop: 10}}>Orientation</Label>
+                            <Text>Straight</Text>
+                            <Radio style={{marginLeft: 5}} selected={this.state.orientation === 'Straight' ? true: false}  onPress={(orientation) => this.setState({orientation: 'Straight'})}/>
+                            <Text style={{marginLeft: 10}}>Gay</Text>
+                            <Radio style={{marginLeft: 5}} selected={this.state.orientation === 'Gay' ? true: false} onPress={(orientation) => this.setState({orientation: 'Gay'})}/>
+                            <Text style={{marginLeft: 10}}>Bi</Text>
+                            <Radio style={{marginLeft: 5, marginRight: 10}} selected={this.state.orientation === 'Bi' ? true: false} onPress={(orientation) => this.setState({orientation: 'Bi'})}/>
+                        </Item>
                         <Item
                             fixedLabel
                             style={{
@@ -108,20 +140,13 @@ export default class EditProfilePopup extends React.Component {
                             <Label>Full Name</Label>
                             <Input/>
                         </Item>
+
                         <Item
                             fixedLabel
                             style={{
                             marginTop: 30
                         }}>
-                            <Label>Sex</Label>
-                            <Input/>
-                        </Item>
-                        <Item
-                            fixedLabel
-                            style={{
-                            marginTop: 30
-                        }}>
-                            <Label>Home City</Label>
+                            <Label>Location</Label>
                             <Input/>
                         </Item>
                         <Item
@@ -165,7 +190,7 @@ export default class EditProfilePopup extends React.Component {
                         <Text>Cancel</Text>
                     </Button >
                 </Content>
-            </PopupDialog> 
+            </PopupDialog>
         );
 
     }
