@@ -4,8 +4,11 @@ import axios from 'axios';
 import {setUserEmail, setUserName, fetchUser} from "../redux/userActions";
 import {connect} from "react-redux";
 import {ImagePicker} from 'expo';
+import DatePicker from 'react-native-datepicker';
+
 const pItem = Picker.Item;
 const showAnimation = true;
+const currentDate = new Date();
 
 import {
     Content,
@@ -36,7 +39,8 @@ export default class EditProfilePopup extends React.Component {
         this.state = {
             selectedRelationship: 'key0',
             selectedSex: 'None',
-            image: null
+            image: null,
+            date: null
         }
     }
 
@@ -59,18 +63,18 @@ export default class EditProfilePopup extends React.Component {
         showAnimation = false;
     }
 
-     _PickImagePress = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [4, 4]
-    });
+    _PickImagePress = async() => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: true,
+            aspect: [4, 4]
+        });
 
-    console.log(result);
+        console.log(result);
 
-    if (!result.cancelled) {
-      this.setState({ image: result.uri });
-    }
-  };
+        if (!result.cancelled) {
+            this.setState({image: result.uri});
+        }
+    };
 
     _UpdateProfilePress()
     {}
@@ -99,11 +103,14 @@ export default class EditProfilePopup extends React.Component {
                     <TouchableOpacity onPress={this._PickImagePress}>
                         <Thumbnail
                             large
-                            source={this.state.image != null ? {uri: this.state.image} : require('../images/blank.png')}
+                            source={this.state.image != null
+                            ? {
+                                uri: this.state.image
+                            }
+                            : require('../images/blank.png')}
                             style={{
                             marginTop: 30,
-                            alignSelf: 'center',
-                            
+                            alignSelf: 'center'
                         }}/>
                     </TouchableOpacity>
                     <Form style={{
@@ -174,7 +181,14 @@ export default class EditProfilePopup extends React.Component {
                             <Label>Full Name</Label>
                             <Input/>
                         </Item>
-
+                        <Item
+                            fixedLabel
+                            style={{
+                            marginTop: 30
+                        }}>
+                            <Label>Phone # (Not Public)</Label>
+                            <Input/>
+                        </Item>
                         <Item
                             fixedLabel
                             style={{
@@ -188,8 +202,31 @@ export default class EditProfilePopup extends React.Component {
                             style={{
                             marginTop: 30
                         }}>
-                            <Label>Birthday</Label>
-                            <Input/>
+                            <Label style={{marginTop: 30}}>Birthday</Label>
+                            <DatePicker
+                                style={{
+                                width: 200,
+                                marginRight: 10
+                            }}
+                                date={this.state.date}
+                                mode="date"
+                                placeholder="Select Date"
+                                format="YYYY-MM-DD"
+                                minDate="1900-01-01"
+                                maxDate="2100-01-01"
+                                confirmBtnText="Confirm"
+                                cancelBtnText="Cancel"
+                                customStyles={{
+                                dateInput: {
+                                  //  marginLeft: 36
+                                 
+                                }, // ... You can check the source to find the other keys. }}
+                                dateTouchBody: {
+                                }
+                                }}
+                                onDateChange={(date) => {
+                                this.setState({date: date})
+                            }}/>
                         </Item>
                         <Item
                             fixedLabel
