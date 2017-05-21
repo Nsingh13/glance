@@ -1,5 +1,5 @@
 import React from 'react';
-import {View} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import axios from 'axios';
 import {setUserEmail, setUserName, fetchUser} from "../redux/userActions";
 import {connect} from "react-redux";
@@ -36,7 +36,7 @@ export default class EditProfilePopup extends React.Component {
         this.state = {
             selectedRelationship: 'key0',
             selectedSex: 'None',
-            orientation: 'None'
+            image: null
         }
     }
 
@@ -58,6 +58,19 @@ export default class EditProfilePopup extends React.Component {
     {
         showAnimation = false;
     }
+
+     _PickImagePress = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [4, 4]
+    });
+
+    console.log(result);
+
+    if (!result.cancelled) {
+      this.setState({ image: result.uri });
+    }
+  };
 
     _UpdateProfilePress()
     {}
@@ -83,19 +96,23 @@ export default class EditProfilePopup extends React.Component {
                 ? new SlideAnimation({slideFrom: 'bottom'})
                 : new DefaultAnimation({toValue: 0, animationDuration: 0})}>
                 <Content>
-                    <Thumbnail
-                        size={80}
-                        source={require('../images/blank.png')}
-                        style={{
-                        marginTop: 30,
-                        alignSelf: 'center'
-                    }}/>
-
+                    <TouchableOpacity onPress={this._PickImagePress}>
+                        <Thumbnail
+                            large
+                            source={this.state.image != null ? {uri: this.state.image} : require('../images/blank.png')}
+                            style={{
+                            marginTop: 30,
+                            alignSelf: 'center',
+                            
+                        }}/>
+                    </TouchableOpacity>
                     <Form style={{
                         marginTop: 15
                     }}>
                         <Picker
-                            style={{marginLeft: 10}}
+                            style={{
+                            marginLeft: 10
+                        }}
                             supportedOrientations={['portrait']}
                             iosHeader="Select Relationship"
                             mode="dropdown"
@@ -105,33 +122,50 @@ export default class EditProfilePopup extends React.Component {
                             <pItem label="In a Relationship" value="key1"/>
                         </Picker>
                         <Item
-                        underline={false}
                             fixedLabel
                             style={{
                             marginTop: 15
                         }}>
-                            <Label style={{marginTop: 10}}>Sex</Label>
+                            <Label
+                                style={{
+                                marginTop: 10
+                            }}>Sex</Label>
                             <Text>Male</Text>
-                            <Radio style={{marginLeft: 5}} selected={this.state.selectedSex === 'Male' ? true: false}  onPress={(selectedSex) => this.setState({selectedSex: 'Male'})}/>
-                            <Text style={{marginLeft: 10}}>Female</Text>
-                            <Radio style={{marginLeft: 5}} selected={this.state.selectedSex === 'Female' ? true: false} onPress={(selectedSex) => this.setState({selectedSex: 'Female'})}/>
-                            <Text style={{marginLeft: 10}}>Other</Text>
-                            <Radio style={{marginLeft: 5, marginRight: 10}} selected={this.state.selectedSex === 'Other' ? true: false} onPress={(selectedSex) => this.setState({selectedSex: 'Other'})}/>
+                            <Radio
+                                style={{
+                                marginLeft: 5
+                            }}
+                                selected={this.state.selectedSex === 'Male'
+                                ? true
+                                : false}
+                                onPress={(selectedSex) => this.setState({selectedSex: 'Male'})}/>
+                            <Text
+                                style={{
+                                marginLeft: 10
+                            }}>Female</Text>
+                            <Radio
+                                style={{
+                                marginLeft: 5
+                            }}
+                                selected={this.state.selectedSex === 'Female'
+                                ? true
+                                : false}
+                                onPress={(selectedSex) => this.setState({selectedSex: 'Female'})}/>
+                            <Text
+                                style={{
+                                marginLeft: 10
+                            }}>Other</Text>
+                            <Radio
+                                style={{
+                                marginLeft: 5,
+                                marginRight: 15
+                            }}
+                                selected={this.state.selectedSex === 'Other'
+                                ? true
+                                : false}
+                                onPress={(selectedSex) => this.setState({selectedSex: 'Other'})}/>
                         </Item>
-                        <Item
-                        underline={false}
-                            fixedLabel
-                            style={{
-                            marginTop: 30
-                        }}>
-                            <Label style={{marginTop: 10}}>Orientation</Label>
-                            <Text>Straight</Text>
-                            <Radio style={{marginLeft: 5}} selected={this.state.orientation === 'Straight' ? true: false}  onPress={(orientation) => this.setState({orientation: 'Straight'})}/>
-                            <Text style={{marginLeft: 10}}>Gay</Text>
-                            <Radio style={{marginLeft: 5}} selected={this.state.orientation === 'Gay' ? true: false} onPress={(orientation) => this.setState({orientation: 'Gay'})}/>
-                            <Text style={{marginLeft: 10}}>Bi</Text>
-                            <Radio style={{marginLeft: 5, marginRight: 10}} selected={this.state.orientation === 'Bi' ? true: false} onPress={(orientation) => this.setState({orientation: 'Bi'})}/>
-                        </Item>
+
                         <Item
                             fixedLabel
                             style={{
