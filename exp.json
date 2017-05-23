@@ -17,9 +17,20 @@
     "hideExponentText": false
   },
   "packagerOpts": {
-    "assetExts": ["ttf"]
+    "assetExts": [
+      "ttf"
+    ]
   },
   "ios": {
-    "supportsTablet": true
+    "supportsTablet": true,
+    "bundleIdentifier": "com.glance.glance"
+  },
+  "android": {
+    "package": "com.glance.glance"
+  },
+  "isDetached": true,
+  "detach": {
+    "scheme": "exp990befe6a1d74ee9a029630aabc0fc04",
+    "androidExpoViewUrl": "https://s3.amazonaws.com/exp-exponent-view-code/android-v1.15.1-sdk16.0.0-2448b7f4-9b6a-4fd0-906d-8bd7da336bd7.tar.gz"
   }
 }

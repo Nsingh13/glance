@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import {setUserEmail, setUserName, fetchUser} from "../redux/userActions";
+import {setUserEmail, fetchUser} from "../redux/userActions";
 import {connect} from "react-redux";
 
 import {
@@ -19,7 +19,8 @@ import * as firebase from 'firebase';
 // Initialize Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyA8KXeYsdS00vCCBgFMePwCI2y3inDAe9c",
-    authDomain: "glance-e7db8.firebaseapp.com"
+    authDomain: "glance-e7db8.firebaseapp.com",
+    storageBucket: "gs://glance-e7db8.appspot.com"
 }
 firebase.initializeApp(firebaseConfig);
 
@@ -34,7 +35,6 @@ export default class LoginForm extends React.Component {
     {
         super(props);
         this.state = {
-            nameText: null,
             emailText: null,
             passwordText: null
         }
@@ -48,20 +48,15 @@ export default class LoginForm extends React.Component {
         firebase
             .auth()
             .createUserWithEmailAndPassword(this.state.emailText, this.state.passwordText)
-            .then(function (user) {        
+            .then(function (user) {
                 // Add to Database
-                axios.post('http://10.0.0.207:3000/users', {
-                    name: form.state.nameText,
-                    age: null,
-                    email: user.email,})
-                    .then(function(response){
-                     // Update Redux Store With my Info
+                axios
+                    .post('http://10.0.0.207:3000/users', {email: user.email})
+                    .then(function (response) {
+                        // Update Redux Store With my Info
                         form
                             .props
                             .dispatch(setUserEmail(form.state.emailText));
-                        form
-                            .props
-                            .dispatch(setUserName(form.state.nameText));
 
                         // Enter App
                         form
@@ -70,12 +65,11 @@ export default class LoginForm extends React.Component {
                             .push(form.props.router.getRoute('rootNavigation'));
 
                         alert("New User Registered");
-                }).catch(function (error) {
-                    console.log(error);
-                });
-                
-                       
-                   
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+
             })
             .catch(function (error) {
                 // Handle Errors here.
@@ -96,7 +90,7 @@ export default class LoginForm extends React.Component {
             .signInWithEmailAndPassword(this.state.emailText, this.state.passwordText)
             .then(function (user) {
 
-              //  alert("Logged in");
+                //  alert("Logged in");
 
                 form
                     .props
@@ -125,15 +119,7 @@ export default class LoginForm extends React.Component {
             <Content>
 
                 <Form >
-                    <Item floatingLabel>
-                        <Label>Full Name</Label>
-                        <Input
-                            style={{
-                            textAlign: 'center'
-                        }}
-                            onChangeText={(nameText) => this.setState({nameText})}
-                            value={this.state.nameText}/>
-                    </Item>
+
                     <Item floatingLabel>
                         <Label>Email</Label>
                         <Input

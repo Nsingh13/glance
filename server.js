@@ -6,8 +6,12 @@ const Schema = mongoose.Schema;
 // Create user parent node
 const userSchema = new Schema({
     name: String,
-    age: Number,
-    email: String
+    email: String,
+    birthday: String,
+    relationshipStatus: String,
+    sex: String,
+    location: String,
+    bio: String
 }, {versionKey: false});
 
 const User = mongoose.model("User", userSchema);

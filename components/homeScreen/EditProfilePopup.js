@@ -26,6 +26,20 @@ import {
 
 import PopupDialog, {SlideAnimation, DefaultAnimation, ScaleAnimation} from 'react-native-popup-dialog';
 
+import * as firebase from 'firebase';
+
+const storageRef = firebase
+    .storage()
+    .ref();
+const myUserRef = null;
+
+// To create blob
+import RNFetchBlob from 'react-native-fetch-blob';
+const Blob = RNFetchBlob.polyfill.Blob;
+const fs = RNFetchBlob.fs;
+window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
+window.Blob = Blob;
+
 @connect((store) => {
     return {user: store.user}
 })
@@ -37,15 +51,20 @@ export default class EditProfilePopup extends React.Component {
     {
         super(props);
         this.state = {
-            selectedRelationship: 'key0',
+            selectedRelationship: 'Single',
             selectedSex: 'None',
             image: null,
-            date: null
+            birthday: null,
+            nameText: null,
+            locationText: null,
+            bioText: null
         }
     }
 
     componentDidMount()
     {
+        myUserRef = storageRef.child(firebase.auth().currentUser.email + '/profile.jpg');
+
         this
             .popupDialog
             .show();
@@ -73,15 +92,105 @@ export default class EditProfilePopup extends React.Component {
 
         if (!result.cancelled) {
             this.setState({image: result.uri});
+            const file = result.uri;
+            reader.onloadend = function () {
+                console.log('RESULT', reader.result)
+            }
+            imageFile = reader.readAsDataURL(file);
         }
+
     };
 
+    uploadImage(uri, mime = 'application/octet-stream') {
+        return new Promise((resolve, reject) => {
+            const uploadUri = Platform.OS === 'ios'
+                ? uri.replace('file://', '')
+                : uri
+            let uploadBlob = null
+
+            const imageRef = FirebaseClient
+                .storage()
+                .ref('images')
+                .child('image_001')
+
+            fs
+                .readFile(uploadUri, 'base64')
+                .then((data) => {
+                    return Blob.build(data, {type: `${mime};BASE64`})
+                })
+                .then((blob) => {
+                    uploadBlob = blob
+                    return imageRef.put(blob, {contentType: mime})
+                })
+                .then(() => {
+                    uploadBlob.close()
+                    return imageRef.getDownloadURL()
+                })
+                .then((url) => {
+                    resolve(url)
+                })
+                .catch((error) => {
+                    reject(error)
+                })
+        })
+    }
+
     _UpdateProfilePress()
-    {}
+    {
+        if (this.state.selectedSex == null || this.state.image == null || this.state.birthday == null || this.state.nameText == null) {
+            alert("Cannot Update. Minimum Requirements: Sex, Name, Birthday, Profile Image.");
+        } else {
+            this
+                .uploadImage(this.state.image)
+                .then(url => {
+
+                    // Store Image to Google Cloud Storage (Firebase Wrapper)
+                    myUserRef
+                        .put(blob, {contentType: 'image/jpg'})
+                        .then(function (snapshot) {
+                            // Add Other Info to Database
+                            axios
+                                .put('http://10.0.0.207:3000/users', {
+                                    name: this.state.nameText,
+                                    birthday: this.state.birthday,
+                                    relationshipStatus: this.state.selectedRelationship,
+                                    sex: this.state.selectedSex,
+                                    location: this.state.locationText,
+                                    bio: this.state.bioText
+                                })
+                                .then(function (response) {
+                                    // Update Redux Store With Only Info Shared Between Components
+                                    form
+                                        .props
+                                        .dispatch(setUserName(form.state.nameText));
+
+                                    // Close Popup
+                                    this
+                                        .popupDialog
+                                        .dismiss();
+
+                                })
+                                .catch(function (error) {
+                                    console.log(error);
+                                });
+                        })
+                        .catch(function (error) {});
+                })
+                .catch(error => console.log(error))
+
+        }
+    }
 
     _CancelPress()
-    {}
-
+    {
+        if (this.state.selectedSex == null || this.state.image == null || this.state.birthday == null || this.state.nameText == null) 
+            alert("Cannot Cancel. Minimum Requirements: Sex, Name, Birthday, Profile Image");
+        else 
+            this
+                .popupDialog
+                .dismiss();
+        }
+    
     render()
     {
         const {user} = this.props;
@@ -125,8 +234,8 @@ export default class EditProfilePopup extends React.Component {
                             mode="dropdown"
                             onValueChange={(selectedRelationship) => this.setState({selectedRelationship})}
                             selectedValue={this.state.selectedRelationship}>
-                            <pItem label="Single" value="key0"/>
-                            <pItem label="In a Relationship" value="key1"/>
+                            <pItem label="Single" value="Single"/>
+                            <pItem label="In a Relationship" value="In a Relationship"/>
                         </Picker>
                         <Item
                             fixedLabel
@@ -179,36 +288,36 @@ export default class EditProfilePopup extends React.Component {
                             marginTop: 30
                         }}>
                             <Label>Full Name</Label>
-                            <Input/>
+                            <Input
+                                onChangeText={(nameText) => this.setState({nameText})}
+                                value={this.state.nameText}/>
                         </Item>
-                        <Item
-                            fixedLabel
-                            style={{
-                            marginTop: 30
-                        }}>
-                            <Label>Phone # (Not Public)</Label>
-                            <Input/>
-                        </Item>
+
                         <Item
                             fixedLabel
                             style={{
                             marginTop: 30
                         }}>
                             <Label>Location</Label>
-                            <Input/>
+                            <Input
+                                onChangeText={(locationText) => this.setState({locationText})}
+                                value={this.state.locationText}/>
                         </Item>
                         <Item
                             fixedLabel
                             style={{
                             marginTop: 30
                         }}>
-                            <Label style={{marginTop: 30}}>Birthday</Label>
+                            <Label
+                                style={{
+                                marginTop: 30
+                            }}>Birthday</Label>
                             <DatePicker
                                 style={{
                                 width: 200,
                                 marginRight: 10
                             }}
-                                date={this.state.date}
+                                date={this.state.birthday}
                                 mode="date"
                                 placeholder="Select Date"
                                 format="YYYY-MM-DD"
@@ -217,15 +326,9 @@ export default class EditProfilePopup extends React.Component {
                                 confirmBtnText="Confirm"
                                 cancelBtnText="Cancel"
                                 customStyles={{
-                                dateInput: {
-                                  //  marginLeft: 36
-                                 
-                                }, // ... You can check the source to find the other keys. }}
-                                dateTouchBody: {
-                                }
-                                }}
-                                onDateChange={(date) => {
-                                this.setState({date: date})
+                                dateInput: { // marginLeft: 36 }, // ... You can check the source to find the other keys. }}
+                                } }} onDateChange={(birthday) => {
+                                this.setState({birthday: birthday})
                             }}/>
                         </Item>
                         <Item
@@ -234,7 +337,10 @@ export default class EditProfilePopup extends React.Component {
                             marginTop: 30
                         }}>
                             <Label>Short Bio</Label>
-                            <Input multiline={true}/>
+                            <Input
+                                multiline={true}
+                                onChangeText={(bioText) => this.setState({bioText})}
+                                value={this.state.bioText}/>
                         </Item>
                     </Form>
                     <Button
@@ -263,6 +369,4 @@ export default class EditProfilePopup extends React.Component {
                 </Content>
             </PopupDialog>
         );
-
-    }
-}
+    }}
