@@ -26,19 +26,13 @@ import {
 
 import PopupDialog, {SlideAnimation, DefaultAnimation, ScaleAnimation} from 'react-native-popup-dialog';
 
-import * as firebase from 'firebase';
+import firebaseClient from '../firebaseClient';
 
 const storageRef = firebase
     .storage()
     .ref();
 const myUserRef = null;
 
-// To create blob
-import RNFetchBlob from 'react-native-fetch-blob';
-const Blob = RNFetchBlob.polyfill.Blob;
-const fs = RNFetchBlob.fs;
-window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
-window.Blob = Blob;
 
 @connect((store) => {
     return {user: store.user}
@@ -101,53 +95,17 @@ export default class EditProfilePopup extends React.Component {
 
     };
 
-    uploadImage(uri, mime = 'application/octet-stream') {
-        return new Promise((resolve, reject) => {
-            const uploadUri = Platform.OS === 'ios'
-                ? uri.replace('file://', '')
-                : uri
-            let uploadBlob = null
-
-            const imageRef = FirebaseClient
-                .storage()
-                .ref('images')
-                .child('image_001')
-
-            fs
-                .readFile(uploadUri, 'base64')
-                .then((data) => {
-                    return Blob.build(data, {type: `${mime};BASE64`})
-                })
-                .then((blob) => {
-                    uploadBlob = blob
-                    return imageRef.put(blob, {contentType: mime})
-                })
-                .then(() => {
-                    uploadBlob.close()
-                    return imageRef.getDownloadURL()
-                })
-                .then((url) => {
-                    resolve(url)
-                })
-                .catch((error) => {
-                    reject(error)
-                })
-        })
-    }
-
     _UpdateProfilePress()
     {
         if (this.state.selectedSex == null || this.state.image == null || this.state.birthday == null || this.state.nameText == null) {
             alert("Cannot Update. Minimum Requirements: Sex, Name, Birthday, Profile Image.");
         } else {
-            this
-                .uploadImage(this.state.image)
-                .then(url => {
+           
 
                     // Store Image to Google Cloud Storage (Firebase Wrapper)
                     myUserRef
-                        .put(blob, {contentType: 'image/jpg'})
-                        .then(function (snapshot) {
+                        .putFile(this.state.image)
+                        .then(function (uploadedFile) {
                             // Add Other Info to Database
                             axios
                                 .put('http://10.0.0.207:3000/users', {
@@ -175,9 +133,8 @@ export default class EditProfilePopup extends React.Component {
                                 });
                         })
                         .catch(function (error) {});
-                })
-                .catch(error => console.log(error))
-
+                
+                
         }
     }
 

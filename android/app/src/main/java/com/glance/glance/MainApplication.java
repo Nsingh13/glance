@@ -17,10 +17,10 @@ public class MainApplication extends MultiDexApplication {
   public List<ReactPackage> getPackages() {
     return Arrays.<ReactPackage>asList(
         // Add your own packages here!
-        // TODO: add cool native modules
-         new RNFirebasePackage(),
+        // TODO: add cool native module
         // Needed for `react-native link`
-         new MainReactPackage()
+        // new MainReactPackage(),
+         new RNFirebasePackage()
     );
   }
 }

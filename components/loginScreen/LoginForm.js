@@ -14,15 +14,7 @@ import {
     Text
 } from 'native-base';
 
-import * as firebase from 'firebase';
-
-// Initialize Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyA8KXeYsdS00vCCBgFMePwCI2y3inDAe9c",
-    authDomain: "glance-e7db8.firebaseapp.com",
-    storageBucket: "gs://glance-e7db8.appspot.com"
-}
-firebase.initializeApp(firebaseConfig);
+import firebaseClient from '../firebaseClient';
 
 @connect((store) => {
     return {user: store.user}
@@ -43,9 +35,9 @@ export default class LoginForm extends React.Component {
     _RegisterPress()
     {
         let form = this;
-
+        
         // Register new user with Firebase
-        firebase
+        firebaseClient
             .auth()
             .createUserWithEmailAndPassword(this.state.emailText, this.state.passwordText)
             .then(function (user) {
@@ -85,7 +77,7 @@ export default class LoginForm extends React.Component {
     {
         let form = this;
 
-        firebase
+        firebaseClient
             .auth()
             .signInWithEmailAndPassword(this.state.emailText, this.state.passwordText)
             .then(function (user) {
