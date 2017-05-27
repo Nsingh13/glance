@@ -35,7 +35,7 @@ export default class LoginForm extends React.Component {
     _RegisterPress()
     {
         let form = this;
-        
+    
         // Register new user with Firebase
         firebaseClient
             .auth()
@@ -64,7 +64,7 @@ export default class LoginForm extends React.Component {
 
             })
             .catch(function (error) {
-                // Handle Errors here.
+            // Handle Errors here.
                 var errorCode = error.errorCode;
                 var errorMessage = error.message;
 
@@ -78,7 +78,7 @@ export default class LoginForm extends React.Component {
         let form = this;
 
         firebaseClient
-            .auth()
+           .auth()
             .signInWithEmailAndPassword(this.state.emailText, this.state.passwordText)
             .then(function (user) {
 
@@ -99,7 +99,7 @@ export default class LoginForm extends React.Component {
                 var errorCode = error.errorCode;
                 var errorMessage = error.message;
 
-                alert(errorMessage);
+               alert(errorMessage);
             });
     }
 

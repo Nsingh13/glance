@@ -28,10 +28,6 @@ import PopupDialog, {SlideAnimation, DefaultAnimation, ScaleAnimation} from 'rea
 
 import firebaseClient from '../firebaseClient';
 
-const storageRef = firebase
-    .storage()
-    .ref();
-const myUserRef = null;
 
 
 @connect((store) => {
@@ -57,8 +53,6 @@ export default class EditProfilePopup extends React.Component {
 
     componentDidMount()
     {
-        myUserRef = storageRef.child(firebase.auth().currentUser.email + '/profile.jpg');
-
         this
             .popupDialog
             .show();
@@ -103,9 +97,9 @@ export default class EditProfilePopup extends React.Component {
            
 
                     // Store Image to Google Cloud Storage (Firebase Wrapper)
-                    myUserRef
-                        .putFile(this.state.image)
-                        .then(function (uploadedFile) {
+           //         myUserRef
+           //             .putFile(this.state.image)
+           //             .then(function (uploadedFile) {
                             // Add Other Info to Database
                             axios
                                 .put('http://10.0.0.207:3000/users', {
@@ -131,8 +125,8 @@ export default class EditProfilePopup extends React.Component {
                                 .catch(function (error) {
                                     console.log(error);
                                 });
-                        })
-                        .catch(function (error) {});
+            //            })
+            //            .catch(function (error) {});
                 
                 
         }
