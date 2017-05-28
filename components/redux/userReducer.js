@@ -3,6 +3,7 @@ export default function reducer(state={
       name: null,
       age: null,
       email: null,
+      profileImage: null,
     },
     isNewUser: true,
   }, action) {
@@ -38,6 +39,12 @@ export default function reducer(state={
         return {
           ...state,
           user: {...state.user, age: action.payload},
+        }
+      }
+      case "SET_USER_IMAGE": {
+        return {
+          ...state,
+          user: {...state.user, profileImage: action.payload},
         }
       }
     }

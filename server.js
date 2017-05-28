@@ -61,6 +61,25 @@ app.post('/users', (req, res) => {
 
 });
 
+// TODO NEXT: Make Update User Data Work
+app.post('/users/update', (req, res) => {
+    alert("update called");
+    // Update user and send to client
+    User.findById(req.params.email, function(err, thisUser)
+    {
+        thisUser = new User(req.body);
+
+        thisUser.save((err, user) => {
+
+        if (err) 
+            return res.send(err);
+        
+        res.send(user);
+        });
+    
+    });
+});
+
 app.use(function (req, res) {
     res.sendFile(__dirname + '/main.js');
 });

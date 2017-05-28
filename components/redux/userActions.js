@@ -33,3 +33,11 @@ export function setUserAge(age) {
   // Update Locally
   return {type: 'SET_USER_AGE', payload: age}
 }
+
+export function setUserImage(profileImage) {
+
+  // Make API call to Update Database
+
+  // Update Locally
+  return {type: 'SET_USER_IMAGE', payload: profileImage}
+}

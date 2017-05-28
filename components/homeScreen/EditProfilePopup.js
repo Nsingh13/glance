@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, TouchableOpacity} from 'react-native';
 import axios from 'axios';
-import {setUserEmail, setUserName, fetchUser} from "../redux/userActions";
+import {setUserEmail, setUserName, setUserImage} from "../redux/userActions";
 import {connect} from "react-redux";
 import {ImagePicker} from 'expo';
 import DatePicker from 'react-native-datepicker';
@@ -80,35 +80,29 @@ export default class EditProfilePopup extends React.Component {
 
         if (!result.cancelled) {
             this.setState({image: result.uri});
-            const file = result.uri;
-            reader.onloadend = function () {
-                console.log('RESULT', reader.result)
-            }
-            imageFile = reader.readAsDataURL(file);
         }
 
     };
 
     _UpdateProfilePress()
     {
+        const form = this;
+
         if (this.state.selectedSex == null || this.state.image == null || this.state.birthday == null || this.state.nameText == null) {
             alert("Cannot Update. Minimum Requirements: Sex, Name, Birthday, Profile Image.");
         } else {
            
+                    // TODO: Store Image to s3 Bucket
 
-                    // Store Image to Google Cloud Storage (Firebase Wrapper)
-           //         myUserRef
-           //             .putFile(this.state.image)
-           //             .then(function (uploadedFile) {
                             // Add Other Info to Database
                             axios
-                                .put('http://10.0.0.207:3000/users', {
-                                    name: this.state.nameText,
-                                    birthday: this.state.birthday,
-                                    relationshipStatus: this.state.selectedRelationship,
-                                    sex: this.state.selectedSex,
-                                    location: this.state.locationText,
-                                    bio: this.state.bioText
+                                .post('http://10.0.0.207:3000/users/update', {
+                                    name: form.state.nameText,
+                                    birthday: form.state.birthday,
+                                    relationshipStatus: form.state.selectedRelationship,
+                                    sex: form.state.selectedSex,
+                                    location: form.state.locationText,
+                                    bio: form.state.bioText
                                 })
                                 .then(function (response) {
                                     // Update Redux Store With Only Info Shared Between Components
@@ -116,17 +110,20 @@ export default class EditProfilePopup extends React.Component {
                                         .props
                                         .dispatch(setUserName(form.state.nameText));
 
+                                    form
+                                        .props
+                                        .dispatch(setUserImage(form.state.image));
+
                                     // Close Popup
-                                    this
+                                    form
                                         .popupDialog
                                         .dismiss();
 
+                                    alert("User Profile Updated");
                                 })
                                 .catch(function (error) {
-                                    console.log(error);
+                                    alert(error);
                                 });
-            //            })
-            //            .catch(function (error) {});
                 
                 
         }
@@ -134,10 +131,12 @@ export default class EditProfilePopup extends React.Component {
 
     _CancelPress()
     {
+        const form = this;
+
         if (this.state.selectedSex == null || this.state.image == null || this.state.birthday == null || this.state.nameText == null) 
             alert("Cannot Cancel. Minimum Requirements: Sex, Name, Birthday, Profile Image");
         else 
-            this
+            form
                 .popupDialog
                 .dismiss();
         }
