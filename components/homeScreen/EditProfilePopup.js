@@ -96,7 +96,8 @@ export default class EditProfilePopup extends React.Component {
 
                             // Add Other Info to Database
                             axios
-                                .post('http://10.0.0.207:3000/users/update', {
+                                .put('http://10.0.0.207:3000/users/editprofile', {
+                                    email: firebaseClient.auth().currentUser.email,
                                     name: form.state.nameText,
                                     birthday: form.state.birthday,
                                     relationshipStatus: form.state.selectedRelationship,
@@ -119,7 +120,6 @@ export default class EditProfilePopup extends React.Component {
                                         .popupDialog
                                         .dismiss();
 
-                                    alert("User Profile Updated");
                                 })
                                 .catch(function (error) {
                                     alert(error);

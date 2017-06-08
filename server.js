@@ -61,23 +61,28 @@ app.post('/users', (req, res) => {
 
 });
 
-// TODO NEXT: Make Update User Data Work
-app.post('/users/update', (req, res) => {
-    alert("update called");
-    // Update user and send to client
-    User.findById(req.params.email, function(err, thisUser)
-    {
-        thisUser = new User(req.body);
+app.put('/users/editprofile', (req, res) => {
 
-        thisUser.save((err, user) => {
+    // Submits changes to user profile
 
-        if (err) 
-            return res.send(err);
-        
-        res.send(user);
+    User
+        .findOneAndUpdate({
+            email: req.body.email
+        }, {
+            name: req.body.name,
+            birthday: req.body.birthday,
+            relationshipStatus: req.body.relationshipStatus,
+            sex: req.body.sex,
+            location: req.body.location,
+            bio: req.body.bio
+        }, function (err, user) {
+            if (err) 
+                throw err;
+            
+            // we have the updated user returned to us
+            res.send(user);
         });
-    
-    });
+
 });
 
 app.use(function (req, res) {
