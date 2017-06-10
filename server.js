@@ -36,15 +36,17 @@ try {
 }
 
 app.get('/users', (req, res) => {
-    // Returns all users
-    User.find((err, users) => {
-
-        if (err) 
-            return res.send(err);
-        
-        res.send(users);
-
-    });
+    // Returns profile info of requested user
+    User
+        .findOne({
+            email: req.query.email
+        }, function (err, user) {
+            if (err) 
+                return res.send(err);
+            
+            // object of the user
+            res.send(user);
+        });
 });
 
 app.post('/users', (req, res) => {
@@ -61,7 +63,7 @@ app.post('/users', (req, res) => {
 
 });
 
-app.put('/users/editprofile', (req, res) => {
+app.put('/users', (req, res) => {
 
     // Submits changes to user profile
 
@@ -77,7 +79,7 @@ app.put('/users/editprofile', (req, res) => {
             bio: req.body.bio
         }, function (err, user) {
             if (err) 
-                throw err;
+                return res.send(err);
             
             // we have the updated user returned to us
             res.send(user);

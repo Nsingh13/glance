@@ -56,7 +56,7 @@ export default class LoginForm extends React.Component {
                             .navigator
                             .push(form.props.router.getRoute('rootNavigation'));
 
-                        alert("New User Registered");
+                        alert("New User Registered: " + response.data.email);
                     })
                     .catch(function (error) {
                         console.log(error);

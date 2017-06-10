@@ -28,8 +28,6 @@ import PopupDialog, {SlideAnimation, DefaultAnimation, ScaleAnimation} from 'rea
 
 import firebaseClient from '../firebaseClient';
 
-
-
 @connect((store) => {
     return {user: store.user}
 })
@@ -51,11 +49,46 @@ export default class EditProfilePopup extends React.Component {
         }
     }
 
+    componentWillMount()
+    {}
+
     componentDidMount()
     {
-        this
-            .popupDialog
-            .show();
+
+        let form = this;
+
+        // Retrieve info from DB
+        axios
+            .get('http://10.0.0.207:3000/users', {
+
+                params: {
+                    email: firebaseClient
+                        .auth()
+                        .currentUser
+                        .email
+                }
+
+            })
+            .then(function (response) {
+
+                form.setState({
+                    selectedRelationship: response.data.relationshipStatus,
+                    selectedSex: response.data.sex,
+                    birthday: response.data.birthday,
+                    nameText: response.data.name,
+                    locationText: response.data.location,
+                    bioText: response.data.bio
+                });
+
+            })
+            .then(function () {
+                form
+                    .popupDialog
+                    .show();
+            })
+            .catch((err) => {
+                alert(err)
+            });
     }
 
     componentDidUpdate(prevProps, prevState)
@@ -63,13 +96,11 @@ export default class EditProfilePopup extends React.Component {
         this
             .popupDialog
             .show();
-    }
 
-    componentWillUpdate(nextProps, nextState)
-    {
-        showAnimation = false;
-    }
-
+        if (showAnimation != false) 
+            showAnimation = false;
+        }
+    
     _PickImagePress = async() => {
         let result = await ImagePicker.launchImageLibraryAsync({
             allowsEditing: true,
@@ -91,41 +122,43 @@ export default class EditProfilePopup extends React.Component {
         if (this.state.selectedSex == null || this.state.image == null || this.state.birthday == null || this.state.nameText == null) {
             alert("Cannot Update. Minimum Requirements: Sex, Name, Birthday, Profile Image.");
         } else {
-           
-                    // TODO: Store Image to s3 Bucket
 
-                            // Add Other Info to Database
-                            axios
-                                .put('http://10.0.0.207:3000/users/editprofile', {
-                                    email: firebaseClient.auth().currentUser.email,
-                                    name: form.state.nameText,
-                                    birthday: form.state.birthday,
-                                    relationshipStatus: form.state.selectedRelationship,
-                                    sex: form.state.selectedSex,
-                                    location: form.state.locationText,
-                                    bio: form.state.bioText
-                                })
-                                .then(function (response) {
-                                    // Update Redux Store With Only Info Shared Between Components
-                                    form
-                                        .props
-                                        .dispatch(setUserName(form.state.nameText));
+            // TODO: Store Image to s3 Bucket Add Other Info to Database
+            axios
+                .put('http://10.0.0.207:3000/users', {
 
-                                    form
-                                        .props
-                                        .dispatch(setUserImage(form.state.image));
+                    email: firebaseClient
+                        .auth()
+                        .currentUser
+                        .email,
+                    name: form.state.nameText,
+                    birthday: form.state.birthday,
+                    relationshipStatus: form.state.selectedRelationship,
+                    sex: form.state.selectedSex,
+                    location: form.state.locationText,
+                    bio: form.state.bioText
 
-                                    // Close Popup
-                                    form
-                                        .popupDialog
-                                        .dismiss();
+                })
+                .then(function (response) {
+                    // Update Redux Store With Only Info Shared Between Components
+                    form
+                        .props
+                        .dispatch(setUserName(form.state.nameText));
 
-                                })
-                                .catch(function (error) {
-                                    alert(error);
-                                });
-                
-                
+                    form
+                        .props
+                        .dispatch(setUserImage(form.state.image));
+
+                    // Close Popup
+                    form
+                        .popupDialog
+                        .dismiss();
+
+                })
+                .catch(function (error) {
+                    alert(error);
+                });
+
         }
     }
 
@@ -319,4 +352,5 @@ export default class EditProfilePopup extends React.Component {
                 </Content>
             </PopupDialog>
         );
-    }}
+    }
+}
