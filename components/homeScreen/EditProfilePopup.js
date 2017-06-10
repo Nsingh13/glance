@@ -50,11 +50,7 @@ export default class EditProfilePopup extends React.Component {
     }
 
     componentWillMount()
-    {}
-
-    componentDidMount()
     {
-
         let form = this;
 
         // Retrieve info from DB
@@ -81,14 +77,17 @@ export default class EditProfilePopup extends React.Component {
                 });
 
             })
-            .then(function () {
-                form
-                    .popupDialog
-                    .show();
-            })
             .catch((err) => {
                 alert(err)
             });
+    }
+
+    componentDidMount()
+    {
+
+        this
+            .popupDialog
+            .show();
     }
 
     componentDidUpdate(prevProps, prevState)
