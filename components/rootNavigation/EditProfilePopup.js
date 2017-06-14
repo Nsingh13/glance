@@ -249,8 +249,6 @@ export default class EditProfilePopup extends React.Component {
 
     _CancelPress()
     {
-        // TODO: Clear any local changes made AKA Reset to DB info (through Redux)
-
         // TODO: Auto-scroll back to top
 
         if (this.state.selectedSex == null || this.state.birthday == null || this.state.nameText == null) 

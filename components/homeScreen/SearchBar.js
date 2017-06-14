@@ -45,9 +45,10 @@ export default class SearchBar extends React.Component {
 
     render()
     {
-        const {user} = this.props;
+        const form = this;
 
         return (
+            
             <Header
                 searchBar
                 rounded
@@ -63,7 +64,7 @@ export default class SearchBar extends React.Component {
                         onPress={this
                         ._openEditProfilePress
                         .bind(this)}>
-                        <Thumbnail small source={require('../images/blank.png')}/>
+                        <Thumbnail small source={form.props.user.profileImage ? {uri: form.props.user.profileImage}: require('../images/blank.png')}/>
                     </TouchableOpacity>
                     <TouchableOpacity
                         onPress={this
