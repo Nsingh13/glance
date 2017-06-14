@@ -1,6 +1,5 @@
 import React from 'react';
-import {Constants} from 'expo';
-import {View, Text, StatusBar} from 'react-native';
+import {View, Text} from 'react-native';
 import {connect} from "react-redux";
 
 import {
@@ -13,9 +12,19 @@ import {
   Content
 } from 'native-base';
 
+import SearchBar from '../components/homeScreen/SearchBar';
+
+import Router from '../navigation/Router';
+import {
+  createRouter,
+  NavigationProvider,
+  StackNavigation,
+} from '@expo/ex-navigation';
+
+
 @connect((store) => {
-  return {user: store.user, isNewUser: store.isNewUser}
-})
+  return {user: store.user}
+}, null, null)
 export default class HomeScreen extends React.Component {
 
   static route = {
@@ -29,31 +38,22 @@ export default class HomeScreen extends React.Component {
     super(props);
     // Set State
     this.state = {}
+    
+  }
+
+  componentDidMount()
+  {
   }
 
   render() {
-    const {isNewUser} = this.props.isNewUser;
 
     return (
       <Container>
 
-        <Header
-          searchBar
-          rounded
-          style={{
-          backgroundColor: 'white',
-          marginTop: Constants.statusBarHeight
-        }}>
-          <StatusBar translucent={false} backgroundColor="blue"/>
-          <Item>
-            <Icon name="ios-search"/>
-            <Input placeholder="Search"/>
-            <Icon name="ios-people"/>
-          </Item>
-          <Button transparent>
-            <Text>Search</Text>
-          </Button>
-        </Header>
+        <SearchBar  
+        navigator={this.props.navigator}
+        router={Router}
+        />
 
       </Container>
     );

@@ -13,12 +13,22 @@ import Router from '../navigation/Router';
 
 import {Container, Footer, Content} from 'native-base';
 
-import EditProfilePopup from '../components/homeScreen/EditProfilePopup';
+import EditProfilePopup from '../components/rootNavigation/EditProfilePopup';
 
-@connect((store) => {
-  return {isNewUser: store.isNewUser}
-})
 export default class RootNavigation extends React.Component {
+
+  constructor(props)
+    {
+        super(props);
+        this.state = {
+        }
+    }
+
+    componentWillMount()
+    {
+
+    }
+
   componentDidMount() {
     this._notificationSubscription = this._registerForPushNotifications();
 
@@ -30,50 +40,50 @@ export default class RootNavigation extends React.Component {
       .remove();
   }
 
+
   render() {
 
-    return (
-      <Container>
 
+    return (
+
+      <Container>
+        
         <TabNavigation tabBarHeight={46} initialTab="home">
           <TabNavigationItem
             id="links"
-            renderIcon={isSelected => this._renderIcon('book', isSelected)}>
-            <StackNavigation initialRoute="search"/>
+            renderIcon={isSelected => this._renderIcon('users', isSelected)}>
+            <StackNavigation initialRoute={Router.getRoute('search')}/>
           </TabNavigationItem>
 
           <TabNavigationItem
             id="home"
-            renderIcon={isSelected => this._renderIcon('home', isSelected)}>
-            <StackNavigation initialRoute="home"/>
+            renderIcon={isSelected => this._renderIcon('eye', isSelected)}>
+            <StackNavigation initialRoute={Router.getRoute('home')}/>
           </TabNavigationItem>
 
           <TabNavigationItem
             id="settings"
-            renderIcon={isSelected => this._renderIcon('cog', isSelected)}>
-            <StackNavigation initialRoute="chat"/>
+            renderIcon={isSelected => this._renderIcon('comments', isSelected)}>
+            <StackNavigation initialRoute={Router.getRoute('chat')}/>
           </TabNavigationItem>
-        </TabNavigation>
+        </TabNavigation> 
 
-        {this.props.isNewUser
-          ? <EditProfilePopup />
-          : null}
-
+        <EditProfilePopup />
       </Container>
-    );
-  }
 
+    )
+
+  }
   _renderIcon(name, isSelected) {
     return (<FontAwesome
       name={name}
       size={25}
       color={isSelected
-      ? Colors.tabIconSelected
+      ? '#d9534f'
       : Colors.tabIconDefault}/>);
   }
 
-  _registerForPushNotifications() {
-    // Send our push token over to our backend so we can receive notifications You
+  _registerForPushNotifications() { // Send our push token over to our backend so we can receive notifications You
     // can comment the following line out if you want to stop receiving a
     // notification every time you open the app. Check out the source for this
     // function in api/registerForPushNotificationsAsync.js
@@ -95,6 +105,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff'
   },
   selectedTab: {
-    color: Colors.tabIconSelected
+    // color: Colors.tabIconSelected
+    color: '#d9534f'
   }
-});
+})

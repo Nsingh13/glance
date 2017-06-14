@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, TouchableOpacity} from 'react-native';
 import axios from 'axios';
-import {setUserEmail, setUserName, setUserImage} from "../redux/userActions";
+import {fetchEditProfilePopup, setUserName, setUserImage} from "../redux/userActions";
 import {connect} from "react-redux";
 import {ImagePicker} from 'expo';
 import DatePicker from 'react-native-datepicker';
@@ -9,6 +9,8 @@ import DatePicker from 'react-native-datepicker';
 const pItem = Picker.Item;
 const showAnimation = true;
 const currentDate = new Date();
+
+const show = false;
 
 import {
     Content,
@@ -30,7 +32,7 @@ import firebaseClient from '../firebaseClient';
 
 @connect((store) => {
     return {user: store.user}
-})
+}, null, null )
 
 export default class EditProfilePopup extends React.Component {
 
@@ -84,21 +86,17 @@ export default class EditProfilePopup extends React.Component {
 
     componentDidMount()
     {
-
+        // Send this popup to Redux to we can access from anywhere
         this
-            .popupDialog
-            .show();
+            .props
+            .dispatch(fetchEditProfilePopup(this.popupDialog));
     }
 
     componentDidUpdate(prevProps, prevState)
     {
-        this
-            .popupDialog
-            .show();
-
-        if (showAnimation != false) 
-            showAnimation = false;
-        }
+        this.popupDialog.show();
+        showAnimation = false;
+    }
     
     _PickImagePress = async() => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -118,8 +116,8 @@ export default class EditProfilePopup extends React.Component {
     {
         const form = this;
 
-        if (this.state.selectedSex == null || this.state.image == null || this.state.birthday == null || this.state.nameText == null) {
-            alert("Cannot Update. Minimum Requirements: Sex, Name, Birthday, Profile Image.");
+        if (this.state.selectedSex == null || this.state.birthday == null || this.state.nameText == null) {
+            alert("Cannot Update. Minimum Requirements: Sex, Name, Birthday.");
         } else {
 
             // TODO: Store Image to s3 Bucket Add Other Info to Database
@@ -140,6 +138,7 @@ export default class EditProfilePopup extends React.Component {
                 })
                 .then(function (response) {
                     // Update Redux Store With Only Info Shared Between Components
+                    // (so we won't have to read from DB again)
                     form
                         .props
                         .dispatch(setUserName(form.state.nameText));
@@ -163,12 +162,13 @@ export default class EditProfilePopup extends React.Component {
 
     _CancelPress()
     {
-        const form = this;
+        // TODO: Clear any local changes made AKA Reset to DB info (through Redux) 
+        // TODO: Auto-scroll back to top
 
-        if (this.state.selectedSex == null || this.state.image == null || this.state.birthday == null || this.state.nameText == null) 
-            alert("Cannot Cancel. Minimum Requirements: Sex, Name, Birthday, Profile Image");
+        if (this.state.selectedSex == null || this.state.birthday == null || this.state.nameText == null) 
+            alert("Cannot Cancel. Minimum Requirements: Sex, Name, Birthday.");
         else 
-            form
+            this
                 .popupDialog
                 .dismiss();
         }

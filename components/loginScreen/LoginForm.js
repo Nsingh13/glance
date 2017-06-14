@@ -1,7 +1,5 @@
 import React from 'react';
 import axios from 'axios';
-import {setUserEmail, fetchUser} from "../redux/userActions";
-import {connect} from "react-redux";
 
 import {
     Content,
@@ -16,10 +14,6 @@ import {
 
 import firebaseClient from '../firebaseClient';
 
-@connect((store) => {
-    return {user: store.user}
-})
-
 export default class LoginForm extends React.Component {
 
     // Local state used for local components
@@ -27,8 +21,8 @@ export default class LoginForm extends React.Component {
     {
         super(props);
         this.state = {
-            emailText: null,
-            passwordText: null
+            emailText: '13.navjot.singh@gmail.com',
+            passwordText: '131313'
         }
     }
 
@@ -45,17 +39,13 @@ export default class LoginForm extends React.Component {
                 axios
                     .post('http://10.0.0.207:3000/users', {email: user.email})
                     .then(function (response) {
-                        // Update Redux Store With my Info
-                        form
-                            .props
-                            .dispatch(setUserEmail(form.state.emailText));
 
                         // Enter App
                         form
                             .props
                             .navigator
                             .push(form.props.router.getRoute('rootNavigation'));
-
+                            
                         alert("New User Registered: " + response.data.email);
                     })
                     .catch(function (error) {
@@ -83,10 +73,6 @@ export default class LoginForm extends React.Component {
             .then(function (user) {
 
                 //  alert("Logged in");
-
-                form
-                    .props
-                    .dispatch(setUserEmail(form.state.emailText));
 
                 form
                     .props
