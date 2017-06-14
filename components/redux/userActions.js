@@ -1,10 +1,44 @@
+export function setUserEmail(email) {
+  
+  // Update Locally
+  return {type: 'SET_USER_EMAIL', payload: email}
+}
+
 
 export function setUserName(name) {
 
-  // Make API call to Update Database
-
   // Update Locally
   return {type: 'SET_USER_NAME', payload: name}
+}
+
+export function setUserBirthday(birthday) {
+  
+  // Update Locally
+  return {type: 'SET_USER_BIRTHDAY', payload: birthday}
+}
+
+export function setUserRelationshipStatus(relationshipStatus) {
+  
+  // Update Locally
+  return {type: 'SET_USER_RELATIONSHIP_STATUS', payload: relationshipStatus}
+}
+
+export function setUserSex(sex) {
+  
+  // Update Locally
+  return {type: 'SET_USER_SEX', payload: sex}
+}
+
+export function setUserLocation(location) {
+  
+  // Update Locally
+  return {type: 'SET_USER_LOCATION', payload: location}
+}
+
+export function setUserBio(bio) {
+  
+  // Update Locally
+  return {type: 'SET_USER_BIO', payload: bio}
 }
 
 export function setUserImage(profileImage) {

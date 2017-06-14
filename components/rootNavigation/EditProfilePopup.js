@@ -1,7 +1,17 @@
 import React from 'react';
 import {View, TouchableOpacity} from 'react-native';
 import axios from 'axios';
-import {fetchEditProfilePopup, setUserName, setUserImage} from "../redux/userActions";
+import {
+    fetchEditProfilePopup,
+    setUserName,
+    setUserImage,
+    setUserEmail,
+    setUserBirthday,
+    setUserRelationshipStatus,
+    setUserSex,
+    setUserLocation,
+    setUserBio
+} from "../redux/userActions";
 import {connect} from "react-redux";
 import {ImagePicker} from 'expo';
 import DatePicker from 'react-native-datepicker';
@@ -10,7 +20,7 @@ const pItem = Picker.Item;
 const showAnimation = true;
 const currentDate = new Date();
 
-const show = false;
+let updateCount = 0;
 
 import {
     Content,
@@ -32,7 +42,7 @@ import firebaseClient from '../firebaseClient';
 
 @connect((store) => {
     return {user: store.user}
-}, null, null )
+}, null, null)
 
 export default class EditProfilePopup extends React.Component {
 
@@ -76,8 +86,43 @@ export default class EditProfilePopup extends React.Component {
                     nameText: response.data.name,
                     locationText: response.data.location,
                     bioText: response.data.bio
-                });
+                }, () => {
+                                     // Send state info to Redux
+        form
+            .props
+            .dispatch(setUserEmail(firebaseClient.auth().currentUser.email));
 
+        form
+            .props
+            .dispatch(setUserName(form.state.nameText));
+
+        form
+            .props
+            .dispatch(setUserBirthday(form.state.birthday));
+
+        form
+            .props
+            .dispatch(setUserRelationshipStatus(form.state.selectedRelationship));
+
+        form
+            .props
+            .dispatch(setUserSex(form.state.selectedSex));
+
+        form
+            .props
+            .dispatch(setUserLocation(form.state.locationText));
+
+        form
+            .props
+            .dispatch(setUserBio(form.state.bioText));
+
+        form
+            .props
+            .dispatch(setUserImage(form.state.image));
+
+                   // showAnimation = false;
+
+                });
             })
             .catch((err) => {
                 alert(err)
@@ -90,14 +135,24 @@ export default class EditProfilePopup extends React.Component {
         this
             .props
             .dispatch(fetchEditProfilePopup(this.popupDialog));
+
+    }
+
+    componentWillUpdate()
+    {
+        if (updateCount < 2)
+        updateCount++;
+        else
+        showAnimation = false;
     }
 
     componentDidUpdate(prevProps, prevState)
     {
-        this.popupDialog.show();
-        showAnimation = false;
+        this
+            .popupDialog
+            .show();
     }
-    
+
     _PickImagePress = async() => {
         let result = await ImagePicker.launchImageLibraryAsync({
             allowsEditing: true,
@@ -120,59 +175,111 @@ export default class EditProfilePopup extends React.Component {
             alert("Cannot Update. Minimum Requirements: Sex, Name, Birthday.");
         } else {
 
-            // TODO: Store Image to s3 Bucket Add Other Info to Database
-            axios
-                .put('http://10.0.0.207:3000/users', {
+            // Only Update If Anything Changed.. Otherwise Simply Dismiss
+            if (form.state.nameText != form.props.user.name || form.state.birthday != form.props.user.birthday || form.state.selectedRelationship != form.props.user.relationshipStatus || form.state.selectedSex != form.props.user.sex || form.state.locationText != form.props.user.location || form.state.bioText != form.props.user.bio || form.state.image != form.props.user.profileImage) {
+                // TODO: Store Image to s3 Bucket Add Other Info to Database
+                axios
+                    .put('http://10.0.0.207:3000/users', {
 
-                    email: firebaseClient
-                        .auth()
-                        .currentUser
-                        .email,
-                    name: form.state.nameText,
-                    birthday: form.state.birthday,
-                    relationshipStatus: form.state.selectedRelationship,
-                    sex: form.state.selectedSex,
-                    location: form.state.locationText,
-                    bio: form.state.bioText
+                        email: firebaseClient
+                            .auth()
+                            .currentUser
+                            .email,
+                        name: form.state.nameText,
+                        birthday: form.state.birthday,
+                        relationshipStatus: form.state.selectedRelationship,
+                        sex: form.state.selectedSex,
+                        location: form.state.locationText,
+                        bio: form.state.bioText
 
-                })
-                .then(function (response) {
-                    // Update Redux Store With Only Info Shared Between Components
-                    // (so we won't have to read from DB again)
-                    form
-                        .props
-                        .dispatch(setUserName(form.state.nameText));
+                    })
+                    .then(function (response) {
+                        // Update Redux Store With Only Info Shared Between Components (so we won't have
+                        // to read from DB again)
+                        form
+                            .props
+                            .dispatch(setUserEmail(firebaseClient.auth().currentUser.email));
 
-                    form
-                        .props
-                        .dispatch(setUserImage(form.state.image));
+                        form
+                            .props
+                            .dispatch(setUserName(form.state.nameText));
 
-                    // Close Popup
-                    form
-                        .popupDialog
-                        .dismiss();
+                        form
+                            .props
+                            .dispatch(setUserBirthday(form.state.birthday));
 
-                })
-                .catch(function (error) {
-                    alert(error);
-                });
+                        form
+                            .props
+                            .dispatch(setUserRelationshipStatus(form.state.selectedRelationship));
+
+                        form
+                            .props
+                            .dispatch(setUserSex(form.state.selectedSex));
+
+                        form
+                            .props
+                            .dispatch(setUserLocation(form.state.locationText));
+
+                        form
+                            .props
+                            .dispatch(setUserBio(form.state.bioText));
+
+                        form
+                            .props
+                            .dispatch(setUserImage(form.state.image));
+
+                        // Close Popup
+                        form
+                            .popupDialog
+                            .dismiss();
+
+                    })
+                    .catch(function (error) {
+                        alert(error);
+                    });
+            } else {
+                // Close Popup
+                form
+                    .popupDialog
+                    .dismiss();
+            }
 
         }
     }
 
     _CancelPress()
     {
-        // TODO: Clear any local changes made AKA Reset to DB info (through Redux) 
+        // TODO: Clear any local changes made AKA Reset to DB info (through Redux)
+
         // TODO: Auto-scroll back to top
 
         if (this.state.selectedSex == null || this.state.birthday == null || this.state.nameText == null) 
             alert("Cannot Cancel. Minimum Requirements: Sex, Name, Birthday.");
-        else 
-            this
+        else {
+
+            if (this.state.nameText != this.props.user.name || this.state.birthday != this.props.user.birthday || this.state.selectedRelationship != this.props.user.relationshipStatus || this.state.selectedSex != this.props.user.sex || this.state.locationText != this.props.user.location || this.state.bioText != this.props.user.bio || this.state.image != this.props.user.profileImage) {
+                this.setState({
+                    nameText: this.props.user.name,
+                    birthday: this.props.user.birthday,
+                    selectedRelationship: this.props.user.relationshipStatus,
+                    selectedSex: this.props.user.sex,
+                    locationText: this.props.user.location,
+                    bioText: this.props.user.bio,
+                    image: this.props.user.profileImage
+                }, () => {this
+                .popupDialog
+                .dismiss();});
+                }
+            else
+            {
+                this
                 .popupDialog
                 .dismiss();
+            }
+            }
         }
     
+
     render()
     {
         const {user} = this.props;
