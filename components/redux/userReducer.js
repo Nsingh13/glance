@@ -9,6 +9,7 @@ export default function reducer(state = {
     bio: null,
     profileImage: null
   },
+  mainNavigator: null,
   editProfilePopup: null
 }, action) {
 
@@ -36,61 +37,6 @@ export default function reducer(state = {
         }
       }
 
-    case "SET_USER_BIRTHDAY":
-      {
-        return {
-          ...state,
-          user: {
-            ...state.user,
-            birthday: action.payload
-          }
-        }
-      }
-
-    case "SET_USER_RELATIONSHIP_STATUS":
-      {
-        return {
-          ...state,
-          user: {
-            ...state.user,
-            relationshipStatus: action.payload
-          }
-        }
-      }
-
-    case "SET_USER_SEX":
-      {
-        return {
-          ...state,
-          user: {
-            ...state.user,
-            sex: action.payload
-          }
-        }
-      }
-
-    case "SET_USER_LOCATION":
-      {
-        return {
-          ...state,
-          user: {
-            ...state.user,
-            location: action.payload
-          }
-        }
-      }
-
-    case "SET_USER_BIO":
-      {
-        return {
-          ...state,
-          user: {
-            ...state.user,
-            bio: action.payload
-          }
-        }
-      }
-
     case "SET_USER_IMAGE":
       {
         return {
@@ -102,16 +48,14 @@ export default function reducer(state = {
         }
       }
 
-    case "SET_USER_PROFILE":
-    {
-      return {
+    case "FETCH_MAIN_NAVIGATOR":
+      {
+        return {
           ...state,
-          user: {
-            ...state.user,
-            profileImage: action.payload
-          }
+          mainNavigator: action.payload
         }
-    }
+      }
+
     case "FETCH_EDIT_PROFILE_POPUP":
       {
         return {

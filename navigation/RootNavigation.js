@@ -1,6 +1,9 @@
 import React from 'react';
 import {StyleSheet, View, StatusBar} from 'react-native';
 import {connect} from "react-redux";
+import {
+    fetchMainNavigator
+} from "../components/redux/userActions";
 import {Notifications} from 'expo';
 import {StackNavigation, TabNavigation, TabNavigationItem} from '@expo/ex-navigation';
 import {FontAwesome} from '@expo/vector-icons';
@@ -14,6 +17,10 @@ import Router from '../navigation/Router';
 import {Container, Footer, Content} from 'native-base';
 
 import EditProfilePopup from '../components/rootNavigation/EditProfilePopup';
+
+@connect((store) => {
+    return {mainNavigator: store.mainNavigator}
+}, null, null)
 
 export default class RootNavigation extends React.Component {
 
@@ -32,6 +39,9 @@ export default class RootNavigation extends React.Component {
   componentDidMount() {
     this._notificationSubscription = this._registerForPushNotifications();
 
+   this
+      .props
+      .dispatch(fetchMainNavigator(this.props.navigator));
   }
 
   componentWillUnmount() {
@@ -43,6 +53,7 @@ export default class RootNavigation extends React.Component {
 
   render() {
 
+    const form = this;
 
     return (
 

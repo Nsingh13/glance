@@ -51,7 +51,7 @@ export default class HomeScreen extends React.Component {
       <Container>
 
         <SearchBar  
-        navigator={this.props.navigator}
+        navigator={this.props.route.params.mainNavigator}
         router={Router}
         />
 
