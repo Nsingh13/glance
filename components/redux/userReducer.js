@@ -102,6 +102,16 @@ export default function reducer(state = {
         }
       }
 
+    case "SET_USER_PROFILE":
+    {
+      return {
+          ...state,
+          user: {
+            ...state.user,
+            profileImage: action.payload
+          }
+        }
+    }
     case "FETCH_EDIT_PROFILE_POPUP":
       {
         return {

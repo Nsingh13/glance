@@ -47,6 +47,20 @@ export function setUserImage(profileImage) {
   return {type: 'SET_USER_IMAGE', payload: profileImage}
 }
 
+export function editProfileSubmit(name, birthday, relationshipStatus, sex, location, bio, image)
+{
+  return dispatch =>
+  {
+    dispatch(setUserName(name))
+    dispatch(setUserBirthday(birthday))
+    dispatch(setUserRelationshipStatus(relationshipStatus))
+    dispatch(setUserSex(sex))
+    dispatch(setUserLocation(location))
+    dispatch(setUserBio(bio))
+    dispatch(setUserImage(image))
+    
+  }
+}
 export function fetchEditProfilePopup(popup)
 {
   return {type: 'FETCH_EDIT_PROFILE_POPUP', payload: popup}
