@@ -63,6 +63,7 @@ export default function reducer(state = {
           editProfilePopup: action.payload
         }
       }
+
   }
 
   return state

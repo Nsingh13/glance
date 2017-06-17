@@ -11,7 +11,8 @@ const userSchema = new Schema({
     relationshipStatus: String,
     sex: String,
     location: String,
-    bio: String
+    bio: String,
+    glanced: Array
 }, {versionKey: false});
 
 const User = mongoose.model("User", userSchema);
@@ -66,7 +67,7 @@ app.post('/users', (req, res) => {
 app.put('/users', (req, res) => {
 
     // Submits changes to user profile
-
+  
     User
         .findOneAndUpdate({
             email: req.body.email
