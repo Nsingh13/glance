@@ -1,6 +1,6 @@
 import React from 'react';
-import {View} from 'react-native';
-import {Constants} from 'expo';
+import {Platform, View, TouchableOpacity} from 'react-native';
+import {MapView, Constants, Location, Permissions} from 'expo';
 
 import {
   Container,
@@ -17,14 +17,34 @@ import {
 
 export default class PlacesTile extends React.Component {
 
+  constructor(props) {
+    super(props);
+    // Set State
+    this.state = {}
+  }
+
+  _AddPlacePress()
+  {
+    // Go To Map Screen
+    this
+      .props
+      .navigator
+      .push(this.props.router.getRoute('map'));
+  }
+
   render() {
+    const form = this;
+
     return (
+
       <Content>
         <Card style={{
           marginTop: Constants.statusBarHeight
         }}>
           <CardItem header>
-            <Text style={{fontWeight: '500'}}>My Places</Text>
+            <Text style={{
+              fontWeight: '500'
+            }}>My Places</Text>
           </CardItem>
           <Icon
             name='md-pin'
@@ -47,12 +67,16 @@ export default class PlacesTile extends React.Component {
             alignSelf: 'center',
             marginTop: '10%',
             marginBottom: '10%'
-          }}>
+          }}
+            onPress={this
+            ._AddPlacePress
+            .bind(this)}>
             <Icon name='md-add-circle'/>
             <Text>Add One Now!</Text>
           </Button>
         </Card>
       </Content>
+
     );
   }
 }

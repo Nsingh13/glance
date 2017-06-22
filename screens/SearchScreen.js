@@ -12,17 +12,35 @@ import {
   Text
 } from 'native-base';
 
+import Router from '../navigation/Router';
 import PlacesTile from '../components/searchScreen/PlacesTile';
 
 export default class SearchScreen extends React.Component {
 
+   static route = {
+    navigationBar: {
+      visible: false
+    }
+
+  }
+
+  constructor(props) {
+    super(props);
+    // Set State
+    this.state = {
+
+    }
+  }
+
   render() {
+    const form = this;
+
     return (
       <Container>
-      <PlacesTile />
+      <PlacesTile navigator={form.props.navigator} router={Router}/>
       <Button
             dark
-            block
+            full
             iconLeft
              style={{marginTop: '3%'}}
            >
@@ -31,7 +49,7 @@ export default class SearchScreen extends React.Component {
           </Button>
           <Button
             dark
-            block
+            full
             iconLeft
             style={{marginTop: '4%', marginBottom: '9%'}}
            >
