@@ -17,6 +17,8 @@ import {
     Form
 } from 'native-base';
 
+import firebaseClient from '../components/firebaseClient';
+
 export default class MapScreen extends React.Component {
 
     static route = {
@@ -93,17 +95,31 @@ export default class MapScreen extends React.Component {
 
     _addPlacePress()
     {
-        if(this.state.addressText == null || this.state.labelText == null)
-        {
+        const form = this;
+
+        if (this.state.addressText == null || this.state.labelText == null) {
             alert("Please enter both Name/Address and Label");
-        }
-        else if(this.state.markerLocation == null)
-        {
+        } else if (this.state.markerLocation == null) {
             alert("Please choose valid location");
-        }
-        else
-        {
+        } else {
             // Save to Database
+            axios
+                .put('http://10.0.0.207:3000/users', {
+                    updateType: 'addPlace',
+                    email: firebaseClient
+                        .auth()
+                        .currentUser
+                        .email,
+                    placeTitle: form.state.addressText,
+                    placeLabel: form.state.labelText
+                })
+                .then(function (response) {
+                    // Go back
+                    form
+                        .props
+                        .navigator
+                        .pop();
+                })
         }
     }
 

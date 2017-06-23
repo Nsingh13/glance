@@ -37,7 +37,7 @@ export default class HomeScreen extends React.Component {
     super(props);
     // Set State
     this.state = {
-      glancedUsers: null
+      glancedUsers: []
     }
 
   }
@@ -59,7 +59,7 @@ export default class HomeScreen extends React.Component {
 
       })
       .then(function (response) {
-        form.setState({glancedUsers: response.data.glancedUsers})
+        form.setState({glancedUsers: response.data.glanced})
       })
 
   }
@@ -69,7 +69,7 @@ export default class HomeScreen extends React.Component {
 
   render() {
 
-    if (this.state.glancedUsers == null) {
+    if (this.state.glancedUsers.length == 0) {
       return (
         <Container>
 
@@ -104,7 +104,6 @@ export default class HomeScreen extends React.Component {
           <SearchBar navigator={this.props.navigator} router={Router}/>
 
           <Content >
-            // TODO: Show glanced users
           </Content>
 
         </Container>

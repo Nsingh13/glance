@@ -8,11 +8,26 @@ const userSchema = new Schema({
     name: String,
     email: String,
     birthday: String,
-    relationshipStatus: String,
+    relationshipStatus: {
+        type: String,
+        default: 'Single'
+    },
     sex: String,
     location: String,
     bio: String,
-    glanced: Array
+    glanced: Array,
+    places: [
+        {
+            title: {
+                type: String,
+                required: true
+            },
+            label: {
+                type: String,
+                required: true
+            }
+        }
+    ]
 }, {versionKey: false});
 
 const User = mongoose.model("User", userSchema);
@@ -66,26 +81,47 @@ app.post('/users', (req, res) => {
 
 app.put('/users', (req, res) => {
 
-    // Submits changes to user profile
-  
-    User
-        .findOneAndUpdate({
-            email: req.body.email
-        }, {
-            name: req.body.name,
-            birthday: req.body.birthday,
-            relationshipStatus: req.body.relationshipStatus,
-            sex: req.body.sex,
-            location: req.body.location,
-            bio: req.body.bio
-        }, function (err, user) {
-            if (err) 
-                return res.send(err);
-            
-            // we have the updated user returned to us
-            res.send(user);
-        });
-
+    if (req.body.updateType == "profile") {
+        // Submits changes to user profile
+        User
+            .findOneAndUpdate({
+                email: req.body.email
+            }, {
+                name: req.body.name,
+                birthday: req.body.birthday,
+                relationshipStatus: req.body.relationshipStatus,
+                sex: req.body.sex,
+                location: req.body.location,
+                bio: req.body.bio
+            }, function (err, user) {
+                if (err) 
+                    return res.send(err);
+                
+                // we have the updated user returned to us
+                res.send(user);
+            });
+    } else if (req.body.updateType == "addPlace") {
+        // Add place to array
+        User
+            .findOneAndUpdate({
+                email: req.body.email
+            }, {
+                $push: {
+                    "places": {
+                        title: req.body.placeTitle,
+                        label: req.body.placeLabel
+                    }
+                }
+            }, {
+                new: true
+            }, function (err, user) {
+                if (err) 
+                    return res.send(err);
+                
+                // we have the updated user returned to us
+                res.send(user);
+            });
+    }
 });
 
 app.use(function (req, res) {

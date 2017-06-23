@@ -148,7 +148,7 @@ export default class EditProfilePopup extends React.Component {
                 // TODO: Store Image to s3 Bucket Add Other Info to Database
                 axios
                     .put('http://10.0.0.207:3000/users', {
-
+                        updateType: 'profile',
                         email: firebaseClient
                             .auth()
                             .currentUser
