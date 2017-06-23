@@ -1,6 +1,7 @@
 import React from 'react';
 import {Platform, View, TouchableOpacity, StyleSheet, KeyboardAvoidingView} from 'react-native';
 import {MapView, Constants, Location, Permissions} from 'expo';
+import axios from 'axios';
 
 import {
     Container,
@@ -29,7 +30,10 @@ export default class MapScreen extends React.Component {
         super(props);
         // Set State
         this.state = {
-            location: null
+            location: null,
+            markerLocation: null,
+            addressText: null,
+            labelText: null
         }
     }
 
@@ -52,6 +56,57 @@ export default class MapScreen extends React.Component {
             .pop();
     }
 
+    _onNavigatePress()
+    {
+        const form = this;
+
+        // Call Google Maps Geocoding API
+        if (form.state.addressText != null) {
+            axios
+                .get("https://maps.googleapis.com/maps/api/geocode/json?address=" + form.state.addressText + "&key=AIzaSyDmkJxMoINa_SXYvqHfqmAt-p6a0ckULEY")
+                .then(response => {
+                    const results = response.data.results;
+                    if (results[0]) {
+                        // Navigate There
+                        form
+                            .map
+                            .animateToRegion({
+                                latitude: results[0].geometry.location.lat + 0.0003,
+                                longitude: results[0].geometry.location.lng,
+                                latitudeDelta: 0.0032,
+                                longitudeDelta: 0.0031
+                            }, 1006);
+
+                        form.setState({
+                            markerLocation: {
+                                latitude: results[0].geometry.location.lat,
+                                longitude: results[0].geometry.location.lng
+                            }
+                        })
+                    }
+                })
+                .catch(error => {
+                    alert(error);
+                });
+        }
+    }
+
+    _addPlacePress()
+    {
+        if(this.state.addressText == null || this.state.labelText == null)
+        {
+            alert("Please enter both Name/Address and Label");
+        }
+        else if(this.state.markerLocation == null)
+        {
+            alert("Please choose valid location");
+        }
+        else
+        {
+            // Save to Database
+        }
+    }
+
     componentWillMount()
     {
         if (Platform.OS === 'android' && !Constants.isDevice) {
@@ -72,15 +127,53 @@ export default class MapScreen extends React.Component {
                 <Container>
                     <MapView
                         style={styles.map}
-                        customMapStyle={darkMapStyle}
+                        ref={ref => this.map = ref}
                         initialRegion={{
-                        latitude: form.state.location.coords.latitude,
+                        latitude: form.state.location.coords.latitude + 0.0003,
                         longitude: form.state.location.coords.longitude,
                         latitudeDelta: 0.0032,
                         longitudeDelta: 0.0031
-                    }}/>
+                    }}>
+                        {form.state.markerLocation == null
+                            ? <MapView.Marker
+                                    coordinate={{
+                                    latitude: form.state.location.coords.latitude,
+                                    longitude: form.state.location.coords.longitude
+                                }}
+                                    title="Current Location"
+                                    pinColor="#d9534f"
+                                    flat={true}
+                                    onPress={(data) => {
+                                    var coord = data.nativeEvent.coordinate;
+                                    coord.latitude += 0.0003;
+                                    form
+                                        .map
+                                        .animateToRegion({
+                                            latitude: coord.latitude,
+                                            longitude: coord.longitude,
+                                            latitudeDelta: 0.0032,
+                                            longitudeDelta: 0.0031
+                                        }, 600);
+                                }}/>
+                            : <MapView.Marker
+                                coordinate={form.state.markerLocation}
+                                title="0 People"
+                                pinColor="#d9534f"
+                                onPress={(data) => {
+                                var coord = data.nativeEvent.coordinate;
+                                coord.latitude += 0.0003;
+                                form
+                                    .map
+                                    .animateToRegion({
+                                        latitude: coord.latitude,
+                                        longitude: coord.longitude,
+                                        latitudeDelta: 0.0032,
+                                        longitudeDelta: 0.0031
+                                    }, 600);
+                            }}/>}
+                    </MapView>
                     <Button
-                        danger
+                        dark
                         rounded
                         style={{
                         marginTop: Constants.statusBarHeight + 20,
@@ -99,29 +192,44 @@ export default class MapScreen extends React.Component {
                             style={{
                             paddingHorizontal: '5%'
                         }}>
-                            <Item rounded style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', borderColor: 'black'}}>
-                                <Icon active name='home' />
+                            <Item
+                                rounded
+                                style={{
+                                backgroundColor: 'rgba(255, 255, 255, 1)',
+                                borderColor: 'lightgrey'
+                            }}>
+                                <Icon active name='home'/>
                                 <Input
+                                    autoCorrect={false}
                                     placeholder='Enter Name or Address'
                                     style={{
-                                    height: 40,
+                                    height: 35,
                                     fontSize: 22,
                                     textAlign: 'center'
-                                }}/>
+                                }}
+                                    onChangeText={(addressText) => this.setState({addressText})}
+                                    value={this.state.addressText}/>
                             </Item>
                         </View>
                         <View
                             style={{
-                            paddingHorizontal: '20%'
+                            paddingHorizontal: '23%'
                         }}>
-                            <Item rounded style={{backgroundColor: 'rgba(255, 255, 255, 0.8)', borderColor: 'black'}}>
+                            <Item
+                                rounded
+                                style={{
+                                backgroundColor: 'rgba(255, 255, 255, 1)',
+                                borderColor: 'lightgrey'
+                            }}>
                                 <Input
-                                    placeholder='Label (e.g. Work, School, etc.)'
+                                    placeholder='Label (Work, School, etc.)'
                                     style={{
-                                    height: 35,
+                                    height: 30,
                                     fontSize: 14,
                                     textAlign: 'center'
-                                }}/>
+                                }}
+                                    onChangeText={(labelText) => this.setState({labelText})}
+                                    value={this.state.labelText}/>
                             </Item>
                         </View>
                     </Form>
@@ -130,12 +238,26 @@ export default class MapScreen extends React.Component {
                         danger
                         rounded
                         style={{
-                        marginTop: '80%',
+                        marginTop: '65%',
                         marginLeft: '70%'
-                    }}>
+                    }}
+                        onPress={this
+                        ._addPlacePress
+                        .bind(this)}>
+                        <Icon name='md-add'/>
+                    </Button>
+                    <Button
+                        dark
+                        rounded
+                        style={{
+                        marginTop: '5%',
+                        marginLeft: '70%'
+                    }}
+                        onPress={this
+                        ._onNavigatePress
+                        .bind(this)}>
                         <Icon name='md-navigate'/>
                     </Button>
-
                 </Container>
             );
         } else {
@@ -145,7 +267,6 @@ export default class MapScreen extends React.Component {
         }
     }
 
-    
 }
 
 const styles = StyleSheet.create({
@@ -155,188 +276,168 @@ const styles = StyleSheet.create({
 });
 
 const darkMapStyle = [
-  {
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#212121"
-      }
-    ]
-  },
-  {
-    "elementType": "labels.icon",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#757575"
-      }
-    ]
-  },
-  {
-    "elementType": "labels.text.stroke",
-    "stylers": [
-      {
-        "color": "#212121"
-      }
-    ]
-  },
-  {
-    "featureType": "administrative",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#757575"
-      }
-    ]
-  },
-  {
-    "featureType": "administrative.country",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#9e9e9e"
-      }
-    ]
-  },
-  {
-    "featureType": "administrative.land_parcel",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "administrative.locality",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#bdbdbd"
-      }
-    ]
-  },
-  {
-    "featureType": "poi",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#757575"
-      }
-    ]
-  },
-  {
-    "featureType": "poi.park",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#181818"
-      }
-    ]
-  },
-  {
-    "featureType": "poi.park",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#616161"
-      }
-    ]
-  },
-  {
-    "featureType": "poi.park",
-    "elementType": "labels.text.stroke",
-    "stylers": [
-      {
-        "color": "#1b1b1b"
-      }
-    ]
-  },
-  {
-    "featureType": "road",
-    "elementType": "geometry.fill",
-    "stylers": [
-      {
-        "color": "#2c2c2c"
-      }
-    ]
-  },
-  {
-    "featureType": "road",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#8a8a8a"
-      }
-    ]
-  },
-  {
-    "featureType": "road.arterial",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#373737"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#3c3c3c"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway.controlled_access",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#4e4e4e"
-      }
-    ]
-  },
-  {
-    "featureType": "road.local",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#616161"
-      }
-    ]
-  },
-  {
-    "featureType": "transit",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#757575"
-      }
-    ]
-  },
-  {
-    "featureType": "water",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#000000"
-      }
-    ]
-  },
-  {
-    "featureType": "water",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#3d3d3d"
-      }
-    ]
-  }
+    {
+        "elementType": "geometry",
+        "stylers": [
+            {
+                "color": "#212121"
+            }
+        ]
+    }, {
+        "elementType": "labels.icon",
+        "stylers": [
+            {
+                "visibility": "off"
+            }
+        ]
+    }, {
+        "elementType": "labels.text.fill",
+        "stylers": [
+            {
+                "color": "#757575"
+            }
+        ]
+    }, {
+        "elementType": "labels.text.stroke",
+        "stylers": [
+            {
+                "color": "#212121"
+            }
+        ]
+    }, {
+        "featureType": "administrative",
+        "elementType": "geometry",
+        "stylers": [
+            {
+                "color": "#757575"
+            }
+        ]
+    }, {
+        "featureType": "administrative.country",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            {
+                "color": "#9e9e9e"
+            }
+        ]
+    }, {
+        "featureType": "administrative.land_parcel",
+        "stylers": [
+            {
+                "visibility": "off"
+            }
+        ]
+    }, {
+        "featureType": "administrative.locality",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            {
+                "color": "#bdbdbd"
+            }
+        ]
+    }, {
+        "featureType": "poi",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            {
+                "color": "#757575"
+            }
+        ]
+    }, {
+        "featureType": "poi.park",
+        "elementType": "geometry",
+        "stylers": [
+            {
+                "color": "#181818"
+            }
+        ]
+    }, {
+        "featureType": "poi.park",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            {
+                "color": "#616161"
+            }
+        ]
+    }, {
+        "featureType": "poi.park",
+        "elementType": "labels.text.stroke",
+        "stylers": [
+            {
+                "color": "#1b1b1b"
+            }
+        ]
+    }, {
+        "featureType": "road",
+        "elementType": "geometry.fill",
+        "stylers": [
+            {
+                "color": "#2c2c2c"
+            }
+        ]
+    }, {
+        "featureType": "road",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            {
+                "color": "#8a8a8a"
+            }
+        ]
+    }, {
+        "featureType": "road.arterial",
+        "elementType": "geometry",
+        "stylers": [
+            {
+                "color": "#373737"
+            }
+        ]
+    }, {
+        "featureType": "road.highway",
+        "elementType": "geometry",
+        "stylers": [
+            {
+                "color": "#3c3c3c"
+            }
+        ]
+    }, {
+        "featureType": "road.highway.controlled_access",
+        "elementType": "geometry",
+        "stylers": [
+            {
+                "color": "#4e4e4e"
+            }
+        ]
+    }, {
+        "featureType": "road.local",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            {
+                "color": "#616161"
+            }
+        ]
+    }, {
+        "featureType": "transit",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            {
+                "color": "#757575"
+            }
+        ]
+    }, {
+        "featureType": "water",
+        "elementType": "geometry",
+        "stylers": [
+            {
+                "color": "#000000"
+            }
+        ]
+    }, {
+        "featureType": "water",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            {
+                "color": "#3d3d3d"
+            }
+        ]
+    }
 ]
