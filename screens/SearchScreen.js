@@ -42,7 +42,7 @@ export default class SearchScreen extends React.Component {
             dark
             full
             iconLeft
-             style={{marginTop: '3%'}}
+             style={{marginTop: '9%'}}
            >
             <Icon name='md-call'/>
             <Text>Find By Phone</Text>

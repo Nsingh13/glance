@@ -13,10 +13,16 @@ import {
   Content,
   Text,
   Card,
-  CardItem
+  CardItem,
+  List,
+  Right,
+  Left,
+  Body
 } from 'native-base';
 
 import firebaseClient from '../firebaseClient';
+
+console.disableYellowBox = true;
 
 export default class PlacesTile extends React.Component {
 
@@ -34,7 +40,11 @@ export default class PlacesTile extends React.Component {
     this
       .props
       .navigator
-      .push(this.props.router.getRoute('map'));
+      .push(this.props.router.getRoute('map', {
+        reMount: this
+          .componentWillMount
+          .bind(this)
+      }));
   }
 
   componentWillMount()
@@ -104,10 +114,68 @@ export default class PlacesTile extends React.Component {
               </Button>
             </Card>
 
-          : <Card>
-              // TODO NEXT: Show Places [Mini Map : Title, Label] --> Stacked in List
+          : <Card style={{
+            marginTop: Constants.statusBarHeight
+          }}>
 
-            </Card>}
+            <CardItem header>
+              <Text style={{
+                fontWeight: '500'
+              }}>My Places</Text>
+            </CardItem>
+
+            {form
+              .state
+              .addedPlaces
+              .map(place => (
+                <CardItem
+                  key={place._id}
+                  style={{
+                  alignSelf: 'center'
+                }}>
+                  <Card >
+                    <CardItem>
+                      <Left>
+                      <MapView
+                        style={{
+                        flex: 1,
+                        height: 100,
+                      }}
+                        initialRegion={{
+                        latitude: place.lat,
+                        longitude: place.lng,
+                        latitudeDelta: 0.0032,
+                        longitudeDelta: 0.0031
+                      }}/>
+                      </Left>
+                
+                      <Text>{place.title + " - "}</Text>
+                      <Text>{place.label}</Text>
+                     
+                    </CardItem>
+                  </Card>
+                </CardItem>
+              ))}
+
+            <CardItem style={{
+              alignSelf: 'center'
+            }}>
+              <Button
+                danger
+                rounded
+                iconLeft
+                style={{
+                alignSelf: 'center',
+                marginBottom: '5%'
+              }}
+                onPress={this
+                ._AddPlacePress
+                .bind(this)}>
+                <Icon name='md-add-circle'/>
+                <Text>Add Place</Text>
+              </Button>
+            </CardItem>
+          </Card>}
       </Content>
 
     );

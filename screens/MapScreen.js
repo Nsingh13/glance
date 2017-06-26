@@ -111,10 +111,13 @@ export default class MapScreen extends React.Component {
                         .currentUser
                         .email,
                     placeTitle: form.state.addressText,
-                    placeLabel: form.state.labelText
+                    placeLabel: form.state.labelText,
+                    lat: form.state.markerLocation.latitude,
+                    lng: form.state.markerLocation.longitude
                 })
                 .then(function (response) {
                     // Go back
+                    form.props.route.params.reMount();
                     form
                         .props
                         .navigator

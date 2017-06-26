@@ -25,6 +25,14 @@ const userSchema = new Schema({
             label: {
                 type: String,
                 required: true
+            },
+            lat: {
+                type: Number,
+                required: true
+            },
+            lng: {
+                type: Number,
+                required: true
             }
         }
     ]
@@ -109,7 +117,9 @@ app.put('/users', (req, res) => {
                 $push: {
                     "places": {
                         title: req.body.placeTitle,
-                        label: req.body.placeLabel
+                        label: req.body.placeLabel,
+                        lat: req.body.lat,
+                        lng: req.body.lng
                     }
                 }
             }, {
