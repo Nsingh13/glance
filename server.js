@@ -131,7 +131,26 @@ app.put('/users', (req, res) => {
                 // we have the updated user returned to us
                 res.send(user);
             });
-    }
+    } else if (req.body.updateType == "deletePlace") {
+        User
+            .findOneAndUpdate({
+                email: req.body.email
+            }, {
+                $pull: {
+                    "places": {
+                        _id: req.body.id
+                    }
+                }
+            }, {
+                new: true
+            }, function (err, user) {
+                if (err) 
+                   alert(err);
+                
+                // we have the updated user returned to us
+                res.send(user);
+            });
+     }
 });
 
 app.use(function (req, res) {

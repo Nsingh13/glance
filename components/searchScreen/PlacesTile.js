@@ -50,10 +50,28 @@ export default class PlacesTile extends React.Component {
 
   _EditPlacesPress()
   {
-    if(this.state.inEditMode == false)
-    this.setState({inEditMode: true})
-    else
-    this.setState({inEditMode: false})
+    if (this.state.inEditMode == false) 
+      this.setState({inEditMode: true})
+    else 
+      this.setState({inEditMode: false})
+  }
+
+  _DeletePlacePress(id)
+  {
+    const form = this;
+    axios
+      .put('http://10.0.0.231:3000/users', {
+        updateType: 'deletePlace',
+        email: firebaseClient
+          .auth()
+          .currentUser
+          .email,
+        id: id
+      })
+      .then(function (response) {
+        // Reset State
+        form.setState({addedPlaces: response.data.places})
+      })
   }
 
   componentWillMount()
@@ -127,19 +145,36 @@ export default class PlacesTile extends React.Component {
             marginTop: Constants.statusBarHeight
           }}>
 
-            <CardItem header>
+            <CardItem header style={{
+              paddingBottom: '-10%'
+            }}>
               <Text style={{
                 fontWeight: '500'
               }}>My Places</Text>
-              {form.state.inEditMode ?
-              <Button transparent danger style={{marginLeft: '64%'}} onPress={this._EditPlacesPress.bind(this)}>
-                <Icon name ="md-checkmark-circle-outline" />
-                </Button>
-               :
-              <Button transparent danger style={{marginLeft: '64%'}} onPress={this._EditPlacesPress.bind(this)}>
-                <Icon name ="md-clipboard" />
-                </Button> }
-               
+              {form.state.inEditMode
+                ? <Button
+                    transparent
+                    danger
+                    style={{
+                    marginLeft: '64%'
+                  }}
+                    onPress={this
+                    ._EditPlacesPress
+                    .bind(this)}>
+                    <Icon name="md-checkmark-circle-outline"/>
+                  </Button>
+                : <Button
+                  transparent
+                  danger
+                  style={{
+                  marginLeft: '64%'
+                }}
+                  onPress={this
+                  ._EditPlacesPress
+                  .bind(this)}>
+                  <Icon name="md-clipboard"/>
+                </Button>}
+
             </CardItem>
 
             {form
@@ -154,33 +189,48 @@ export default class PlacesTile extends React.Component {
                   <Card >
                     <CardItem>
                       <Left>
-                      <MapView
-                        style={{
-                        flex: 1,
-                        height: 100,
-                        marginRight: '25%'
-                      }}
-                        initialRegion={{
-                        latitude: place.lat,
-                        longitude: place.lng,
-                        latitudeDelta: 0.0032,
-                        longitudeDelta: 0.0031
-                      }}
-                        rotateEnabled={false}
-                        scrollEnabled={false}
-                        pitchEnabled={false}
-                        zoomEnabled={false}/>
+                        <MapView
+                          style={{
+                          flex: 1,
+                          height: 100,
+                          marginRight: '25%'
+                        }}
+                          initialRegion={{
+                          latitude: place.lat,
+                          longitude: place.lng,
+                          latitudeDelta: 0.0032,
+                          longitudeDelta: 0.0031
+                        }}
+                          rotateEnabled={false}
+                          scrollEnabled={false}
+                          pitchEnabled={false}
+                          zoomEnabled={false}/>
                       </Left>
-                      
+
                       <Body>
-                      <Text style={{fontWeight: '500', fontSize: 20, marginTop: '12.5%'}}>{place.label}</Text>
-                      <Text style={{marginTop: '5%', color: 'grey'}}>{place.title}</Text>
-                     </Body>
-                     {form.state.inEditMode ?
-                       <Button transparent danger style={{marginTop: '10%'}}>
-                         <Icon name="md-trash" />
-                         </Button>
-                     : null}
+                        <Text
+                          style={{
+                          fontWeight: '500',
+                          fontSize: 20,
+                          marginTop: '12.5%'
+                        }}>{place.label}</Text>
+                        <Text
+                          style={{
+                          marginTop: '5%',
+                          color: 'grey'
+                        }}>{place.title}</Text>
+                      </Body>
+                      {form.state.inEditMode
+                        ? <Button
+                            transparent
+                            danger
+                            style={{
+                            marginTop: '10%'
+                          }}
+                            onPress={() => this._DeletePlacePress(place._id)}>
+                            <Icon name="md-trash"/>
+                          </Button>
+                        : null}
                     </CardItem>
                   </Card>
                 </CardItem>
