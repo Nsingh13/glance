@@ -30,7 +30,8 @@ export default class PlacesTile extends React.Component {
     super(props);
     // Set State
     this.state = {
-      addedPlaces: []
+      addedPlaces: [],
+      inEditMode: false
     }
   }
 
@@ -47,13 +48,21 @@ export default class PlacesTile extends React.Component {
       }));
   }
 
+  _EditPlacesPress()
+  {
+    if(this.state.inEditMode == false)
+    this.setState({inEditMode: true})
+    else
+    this.setState({inEditMode: false})
+  }
+
   componentWillMount()
   {
     const form = this;
 
     // Fetch all added 'places' from database
     axios
-      .get('http://10.0.0.207:3000/users', {
+      .get('http://10.0.0.231:3000/users', {
 
         params: {
           email: firebaseClient
@@ -122,6 +131,15 @@ export default class PlacesTile extends React.Component {
               <Text style={{
                 fontWeight: '500'
               }}>My Places</Text>
+              {form.state.inEditMode ?
+              <Button transparent danger style={{marginLeft: '64%'}} onPress={this._EditPlacesPress.bind(this)}>
+                <Icon name ="md-checkmark-circle-outline" />
+                </Button>
+               :
+              <Button transparent danger style={{marginLeft: '64%'}} onPress={this._EditPlacesPress.bind(this)}>
+                <Icon name ="md-clipboard" />
+                </Button> }
+               
             </CardItem>
 
             {form
@@ -140,18 +158,29 @@ export default class PlacesTile extends React.Component {
                         style={{
                         flex: 1,
                         height: 100,
+                        marginRight: '25%'
                       }}
                         initialRegion={{
                         latitude: place.lat,
                         longitude: place.lng,
                         latitudeDelta: 0.0032,
                         longitudeDelta: 0.0031
-                      }}/>
+                      }}
+                        rotateEnabled={false}
+                        scrollEnabled={false}
+                        pitchEnabled={false}
+                        zoomEnabled={false}/>
                       </Left>
-                
-                      <Text>{place.title + " - "}</Text>
-                      <Text>{place.label}</Text>
-                     
+                      
+                      <Body>
+                      <Text style={{fontWeight: '500', fontSize: 20, marginTop: '12.5%'}}>{place.label}</Text>
+                      <Text style={{marginTop: '5%', color: 'grey'}}>{place.title}</Text>
+                     </Body>
+                     {form.state.inEditMode ?
+                       <Button transparent danger style={{marginTop: '10%'}}>
+                         <Icon name="md-trash" />
+                         </Button>
+                     : null}
                     </CardItem>
                   </Card>
                 </CardItem>

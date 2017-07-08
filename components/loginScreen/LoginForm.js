@@ -37,7 +37,7 @@ export default class LoginForm extends React.Component {
             .then(function (user) {
                 // Add to Database
                 axios
-                    .post('http://10.0.0.207:3000/users', {email: user.email})
+                    .post('http://10.0.0.231:3000/users', {email: user.email})
                     .then(function (response) {
 
                         // Enter App

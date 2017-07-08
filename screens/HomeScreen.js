@@ -48,7 +48,7 @@ export default class HomeScreen extends React.Component {
 
     // Fetch all 'glanced' users from database
     axios
-      .get('http://10.0.0.207:3000/users', {
+      .get('http://10.0.0.231:3000/users', {
 
         params: {
           email: firebaseClient

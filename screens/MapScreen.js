@@ -104,7 +104,7 @@ export default class MapScreen extends React.Component {
         } else {
             // Save to Database
             axios
-                .put('http://10.0.0.207:3000/users', {
+                .put('http://10.0.0.231:3000/users', {
                     updateType: 'addPlace',
                     email: firebaseClient
                         .auth()
