@@ -62,8 +62,9 @@ export default class EditProfilePopup extends React.Component {
         // Retrieve info from DB
         axios
             .get('http://10.0.0.231:3000/users', {
-
+                
                 params: {
+                    getType: 'myUser',
                     email: firebaseClient
                         .auth()
                         .currentUser

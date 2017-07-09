@@ -74,6 +74,15 @@ export default class PlacesTile extends React.Component {
       })
   }
 
+  _OpenPlacePress(label, title, lat, lng)
+  {
+     // Go To Place Screen
+    this
+      .props
+      .navigator
+      .push(this.props.router.getRoute('place', {label: label, title: title, lat: lat, lng: lng}));
+  }
+
   componentWillMount()
   {
     const form = this;
@@ -83,6 +92,7 @@ export default class PlacesTile extends React.Component {
       .get('http://10.0.0.231:3000/users', {
 
         params: {
+          getType: 'myUser',
           email: firebaseClient
             .auth()
             .currentUser
@@ -181,59 +191,63 @@ export default class PlacesTile extends React.Component {
               .state
               .addedPlaces
               .map(place => (
-                <CardItem
-                  key={place._id}
-                  style={{
-                  alignSelf: 'center'
-                }}>
-                  <Card >
-                    <CardItem>
-                      <Left>
-                        <MapView
-                          style={{
-                          flex: 1,
-                          height: 100,
-                          marginRight: '25%'
-                        }}
-                          initialRegion={{
-                          latitude: place.lat,
-                          longitude: place.lng,
-                          latitudeDelta: 0.0032,
-                          longitudeDelta: 0.0031
-                        }}
-                          rotateEnabled={false}
-                          scrollEnabled={false}
-                          pitchEnabled={false}
-                          zoomEnabled={false}/>
-                      </Left>
+                <TouchableOpacity onPress={() => this._OpenPlacePress(place.label, place.title, place.lat, place.lng)}>
 
-                      <Body>
-                        <Text
-                          style={{
-                          fontWeight: '500',
-                          fontSize: 20,
-                          marginTop: '12.5%'
-                        }}>{place.label}</Text>
-                        <Text
-                          style={{
-                          marginTop: '5%',
-                          color: 'grey'
-                        }}>{place.title}</Text>
-                      </Body>
-                      {form.state.inEditMode
-                        ? <Button
-                            transparent
-                            danger
+                  <CardItem
+                    key={place._id}
+                    style={{
+                    alignSelf: 'center'
+                  }}>
+                    <Card >
+                      <CardItem>
+                        <Left>
+                          <MapView
                             style={{
-                            marginTop: '10%'
+                            flex: 1,
+                            height: 100,
+                            marginRight: '25%'
                           }}
-                            onPress={() => this._DeletePlacePress(place._id)}>
-                            <Icon name="md-trash"/>
-                          </Button>
-                        : null}
-                    </CardItem>
-                  </Card>
-                </CardItem>
+                            initialRegion={{
+                            latitude: place.lat,
+                            longitude: place.lng,
+                            latitudeDelta: 0.0032,
+                            longitudeDelta: 0.0031
+                          }}
+                            rotateEnabled={false}
+                            scrollEnabled={false}
+                            pitchEnabled={false}
+                            zoomEnabled={false}/>
+                        </Left>
+
+                        <Body>
+                          <Text
+                            style={{
+                            fontWeight: '500',
+                            fontSize: 20,
+                            marginTop: '12.5%'
+                          }}>{place.label}</Text>
+                          <Text
+                            style={{
+                            marginTop: '5%',
+                            color: 'grey'
+                          }}>{place.title}</Text>
+                        </Body>
+                        {form.state.inEditMode
+                          ? <Button
+                              transparent
+                              danger
+                              style={{
+                              marginTop: '10%'
+                            }}
+                              onPress={() => this._DeletePlacePress(place._id)}>
+                              <Icon name="md-trash"/>
+                            </Button>
+                          : null}
+                      </CardItem>
+                    </Card>
+                  </CardItem>
+                </TouchableOpacity>
+
               ))}
 
             <CardItem style={{

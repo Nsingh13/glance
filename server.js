@@ -60,17 +60,33 @@ try {
 }
 
 app.get('/users', (req, res) => {
-    // Returns profile info of requested user
-    User
-        .findOne({
-            email: req.query.email
-        }, function (err, user) {
-            if (err) 
-                return res.send(err);
-            
-            // object of the user
-            res.send(user);
-        });
+    if (req.query.getType == 'myUser') {
+        User
+            .findOne({
+                email: req.query.email
+            }, function (err, user) {
+                if (err) 
+                    return res.send(err);
+                
+                // objects of the users
+                res.send(user);
+            });
+    } else if (req.query.getType == 'usersWithSamePlace') {
+        User
+            .find({
+                places: {
+                    lat: req.query.lat,
+                    lng: req.query.lng
+                }
+            }, function (err, users) {
+                if (err) 
+                    return res.send(err);
+                
+                // objects of the users
+                res.send(users);
+            });
+
+    }
 });
 
 app.post('/users', (req, res) => {
@@ -145,12 +161,12 @@ app.put('/users', (req, res) => {
                 new: true
             }, function (err, user) {
                 if (err) 
-                   alert(err);
+                    alert(err);
                 
                 // we have the updated user returned to us
                 res.send(user);
             });
-     }
+    }
 });
 
 app.use(function (req, res) {

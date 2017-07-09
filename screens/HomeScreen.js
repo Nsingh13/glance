@@ -51,6 +51,7 @@ export default class HomeScreen extends React.Component {
       .get('http://10.0.0.231:3000/users', {
 
         params: {
+          getType: 'myUser',
           email: firebaseClient
             .auth()
             .currentUser
